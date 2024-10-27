@@ -1,0 +1,26 @@
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark header">
+    <div class="container-fluid">
+        <a class="logo" href="/" title="Garage Trip">
+            Garage Trip
+        </a>
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="container">
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                <a class="nav-link {% if page.id == 'home' %}active{% endif %}" href="/">Home</a>
+                <a class="nav-link {% if page.id == 'history' %}active{% endif %}" href="/history">History</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
