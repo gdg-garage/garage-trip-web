@@ -1,0 +1,39 @@
+$c-white: #fff;
+$c-blue-dark: #1b1e22;
+$c-blue-bg: #22282f;
+$c-blue-help: #45515f;
+$c-blue-light: #96a2b1;
+$c-blue-discord: #5865f2;
+$c-blue: $c-blue-discord;
+$c-purple: #8430ce;
+$c-yellow: #e5ea11;
+$c-gray: $c-blue-help;
+
+$background: var(--blue-bg);
+$text: var(--white);
+$purple: var(--purple);
+$blue: var(--blue-discord);
+$blue-bg: var(--blue-bg);
+$blue-dark: var(--blue-dark);
+$blue-help: var(--blue-help);
+$blue-light: var(--blue-light);
+$white: var(--white);
+$gray: var(--blue-help);
+$header-container-padding-v: 0.75rem;
+$header-container-padding-h: 1.5rem;
+
+
+$radius: 2rem;
+$breakpoint-desktop: '(min-width: 380px)';
+
+
+:root {
+	--white: #{$c-white};
+	--blue-dark: #{$c-blue-dark};
+	--blue-bg: #{$c-blue-bg};
+	--blue-help: #{$c-blue-help};
+	--blue-light: #{$c-blue-light};
+	--blue-discord: #{$c-blue-discord};
+	--purple: #{$c-purple};
+	--yellow: #{$c-yellow};
+}

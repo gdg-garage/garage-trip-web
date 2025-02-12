@@ -1,19 +1,36 @@
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark header">
-    <div class="container-fluid">
-        <a class="logo" href="/" title="Garage Trip">
-            Garage Trip
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <div class="container-fluid header-container">
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="container">
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                <div class="navbar-nav">
-                <a class="nav-link {% if page.id == 'home' %}active{% endif %}" href="/">Home</a>
-                <a class="nav-link {% if page.id == 'history' %}active{% endif %}" href="/history">History</a>
-                </div>
+        <a class="logo header-item" href="/" title="Garage Trip">
+            Garage Trip
+        </a>
+        <div class="menu">
+            <div class="menu-container-desktop">
+                <a class="menu-link {% if page.id == 'home' %}active{% endif %}" href="/">Home</a>
+                <a class="menu-link {% if page.id == 'history' %}active{% endif %}" href="/history">History</a>
             </div>
         </div>
+        <div class="header-item">
+            {% include button-link.html
+                url="https://forms.gle/VVTcqsUrWKvuSpXx6"
+                text="Join the event"
+                variant="purple"
+                size="small"
+            %}
+        </div>
+    </div>
+    <div class="collapse menu-container-phone" id="navbarNavAltMarkup">
+        <a class="menu-link {% if page.id == 'home' %}active{% endif %}" href="/">Home</a>
+        <a class="menu-link {% if page.id == 'history' %}active{% endif %}" href="/history">History</a>
     </div>
 </nav>

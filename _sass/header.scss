@@ -1,0 +1,17 @@
+.header {
+    padding: 0;
+    background-color: $blue-dark;
+    
+    &-container {
+        flex-shrink: 0;
+        padding: 0 $header-container-padding-h;
+    }
+
+    &-item {
+        padding: $header-container-padding-v 0;
+    }
+
+    .navbar-toggler {
+        padding: 0.125rem;
+    }
+}
