@@ -315,3 +315,37 @@ a {
         background-repeat: no-repeat;
     }
 }
+
+#schedule {
+    .day  {
+        border-radius: calc($radius / 2);
+        background-color: $c-blue-bg;
+        padding: 0.5rem;
+        min-height: 8rem;
+
+        transition: all 300ms;
+
+        &:hover {
+            .date {
+                border-color: $c-yellow;
+            }
+        }
+
+        .date{
+            font-weight: bold;
+            text-align: center;
+            border-bottom: $c-blue 2px solid;
+            font-size: 1.2rem;
+        }
+
+        ul {
+            padding: 0.5rem 0.75rem;
+            margin: 0;
+            
+
+            li {
+                list-style-type: none;
+            }
+        } 
+    }
+}
