@@ -318,7 +318,7 @@ a {
 
 #schedule {
     .day  {
-        border-radius: calc($radius / 2);
+        border-radius: calc(#{$radius} / 2);
         background-color: $c-blue-bg;
         padding: 0.5rem;
         min-height: 8rem;
