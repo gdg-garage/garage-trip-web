@@ -5,6 +5,11 @@
     &-container {
         flex-shrink: 0;
         padding: 0 $header-container-padding-h;
+        min-height: 3.5rem;
+
+        @media #{$breakpoint-desktop} {
+            min-height: 4rem;
+        }
     }
 
     &-item {
