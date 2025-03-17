@@ -5,31 +5,25 @@ id: home
 ---
 <div class="container" style="padding: 5rem 0">
     <div class="row text-center">
-        <h1 class="mb-3">Garage Trip 6.9</h1>
+        <h1 class="mb-3 home-header">Garage Trip 6.9</h1>
         <p><em>Nice. A great thing, ruined by a period.</em></p>
     </div>
 
-    <div class="row">
-        <div class="col-lg-6 offset-lg-3 col-xxl-4 offset-xxl-4 text-center">
-            <div class="row gy-4">
-                <div class="col-lg-6">
-                    {% include button-link.html
-                        url="https://forms.gle/VVTcqsUrWKvuSpXx6"
-                        text="Join the event"
-                        icon="event"
-                        variant="purple"
-                    %}
-                </div>
-                <div class="col-lg-6">
-                    {% include button-link.html
-                        url="https://www.google.com/url?q=https%3A%2F%2Fdiscord.gg%2FTnaMJMyTDw&sa=D&sntz=1&usg=AOvVaw3YQU0DYutiJ5kX9ptEAJi9"
-                        text="Join our Discord"
-                        icon="discord"
-                        variant="blue"
-                    %}
-                </div>
-            </div>
-        </div>
+    <div class="home-actions">
+        {% include button-link.html
+            url="https://forms.gle/VVTcqsUrWKvuSpXx6"
+            text="Join the event"
+            icon="event"
+            variant="purple"
+            size="big"
+        %}
+        {% include button-link.html
+            url="https://www.google.com/url?q=https%3A%2F%2Fdiscord.gg%2FTnaMJMyTDw&sa=D&sntz=1&usg=AOvVaw3YQU0DYutiJ5kX9ptEAJi9"
+            text="Join our Discord"
+            icon="discord"
+            variant="blue"
+            size="big"
+        %}
     </div>
 </div>
 
