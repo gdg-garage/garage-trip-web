@@ -1,6 +1,7 @@
 .menu {
     display: none;
     // display: flex;
+    @include main-font;
 
     &-container-phone {
         display: flex;
