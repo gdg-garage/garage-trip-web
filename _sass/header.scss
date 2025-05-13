@@ -1,7 +1,7 @@
 .header {
     padding: 0;
     background-color: rgba($c-blue-dark, 0.8);
-    backdrop-filter:blur(4px);
+    backdrop-filter:blur(8px);
     
     &-container {
         flex-shrink: 0;
@@ -23,6 +23,7 @@
 
     .logo {
         @include main-font;
+        flex: space-between;
 
         &:hover,
         &:active {
