@@ -1,6 +1,7 @@
 .header {
     padding: 0;
-    background-color: $blue-dark;
+    background-color: rgba($c-blue-dark, 0.8);
+    backdrop-filter:blur(4px);
     
     &-container {
         flex-shrink: 0;
@@ -18,5 +19,16 @@
 
     .navbar-toggler {
         padding: 0.125rem;
+    }
+
+    .logo {
+        @include main-font;
+
+        &:hover,
+        &:active {
+            color: $text;
+        }
+
+        text-decoration: none;
     }
 }
