@@ -329,13 +329,18 @@ a {
     font-size: 2em;
 }
 
-.logo-playground {
+.logo-playground-container {
     display: flex;
-    padding: 100px 0;
-    align-items: center;
     justify-content: center;
     width: 100%;
-    border: solid 2px $c-white;
+
+    .logo-playground-border {
+        border: solid 2px $text;
+    }
+}
+
+.logo-playground {
+    padding: 200px;
     background-color: $c-blue-dark;
     font-size: 40pt;
 }

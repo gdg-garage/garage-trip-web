@@ -19,16 +19,17 @@
 
     .navbar-toggler {
         padding: 0.125rem;
+    } 
+}
+
+.logo {
+    @include main-font;
+
+    &:hover,
+    &:active {
+        color: $c-white !important;
     }
 
-    .logo {
-        @include main-font;
-
-        &:hover,
-        &:active {
-            color: $text;
-        }
-
-        text-decoration: none;
-    }
+    text-decoration: none;
+    color: $c-white;
 }
