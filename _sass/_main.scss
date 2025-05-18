@@ -9,6 +9,19 @@
 body {
   color: $text;
   background-color: $background;
+  font-family: Helvetica, Sans-Serif;
+}
+
+.secondary-color {
+    color: $c-blue-discord;
+}
+
+h1, h2, h3, h4, h5, h6 {
+   @include main-font;
+}
+
+.monospace {
+    @include main-font;
 }
 
 .box {
@@ -156,6 +169,7 @@ body {
 }
 
 .button {
+    @include main-font;
     display: inline-flex;
     padding: 0.5rem 1rem;
     gap: 0.75rem;
@@ -216,13 +230,11 @@ body {
     }
 }
 
-
-
 a {
     color: $text;
 
-   &:not(.button):hover {
-        color: darken(white, 20%);
+    &:not(.button):hover {
+        color: darken($c-blue-light, 10%);
     }
 }
 
@@ -249,18 +261,6 @@ a {
     @media (min-width: 992px) {
         max-width: 1440px;
     }
-}
-
-
-.logo {
-    &:hover,
-    &:active {
-        color: #cccccc;
-    }
-
-    text-decoration: none;
-    text-transform: uppercase;
-    font-weight: bold;
 }
 
 .footer {
@@ -327,4 +327,20 @@ a {
 
 .socials{
     font-size: 2em;
+}
+
+.logo-playground-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+
+    .logo-playground-border {
+        border: solid 2px $text;
+    }
+}
+
+.logo-playground {
+    padding: 200px;
+    background-color: $c-blue-dark;
+    font-size: 40pt;
 }
