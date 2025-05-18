@@ -328,3 +328,14 @@ a {
 .socials{
     font-size: 2em;
 }
+
+.logo-playground {
+    display: flex;
+    padding: 100px 0;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border: solid 2px $c-white;
+    background-color: $c-blue-dark;
+    font-size: 40pt;
+}
