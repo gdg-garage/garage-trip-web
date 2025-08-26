@@ -325,22 +325,47 @@ a {
     }
 }
 
-.socials{
+.socials {
     font-size: 2em;
 }
 
-.logo-playground-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
+.desktop-visible {
+    display: none;
+}
 
-    .logo-playground-border {
-        border: solid 2px $text;
-    }
+.desktop-invisible {
+    display: initial;
+}
+
+.logo-playground-container {
+    border: solid 2px $text;
 }
 
 .logo-playground {
-    padding: 200px;
-    background-color: $c-blue-dark;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 10px;
+    width: 100%;
+    height: 100%;
+}
+
+.logo-playground-text {
     font-size: 40pt;
 }
+
+@media #{$breakpoint-desktop} {
+    .logo-playground {
+        min-height: 480px;
+    }
+
+    .desktop-visible {
+        display: initial;
+    }
+
+    .desktop-invisible {
+        display: none;
+    }
+}
+
