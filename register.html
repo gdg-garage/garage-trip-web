@@ -1,0 +1,200 @@
+---
+layout: default
+title: Register
+id: register
+---
+
+<div id="auth-loading" class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <div class="box">
+            <div class="spinner-border text-primary mx-auto mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Checking authentication...</p>
+        </div>
+    </div>
+</div>
+
+<div id="auth-unauthorized" class="row justify-content-center mt-5" style="display: none;">
+    <div class="col-md-6">
+        <div class="box p-5">
+            <h3 class="mb-4">Authentication Required;</h3>
+            <p class="mb-4">You need to be logged in and a member of our <a href="https://discord.com/invite/TnaMJMyTDw"
+                    target="_blank" class="secondary-color">Discord server</a> to register for the event.</p>
+            <div class="d-flex justify-content-center mt-3">
+                <a id="discord-login-link" href="https://api.garage-trip.cz/auth/discord/login" class="button blue big">
+                    <i class="bi bi-discord"></i> Login via Discord
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="auth-authorized" class="row mt-4" style="display: none;">
+    <div class="col-lg-8 offset-lg-2">
+        <div class="box">
+            <h3>Register for Event 7.0.0;</h3>
+            <p>Welcome, <span id="user-display-name" class="secondary-color"></span>!</p>
+            <hr class="my-4 border-secondary">
+
+            <form id="registration-form" class="mt-4">
+                <div class="row gy-4">
+                    <div class="col-md-6">
+                        <label for="arrival_date" class="form-label">Arrival Date</label>
+                        <input type="date" class="form-control bg-dark text-white border-secondary" id="arrival_date"
+                            required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="departure_date" class="form-label">Departure Date</label>
+                        <input type="date" class="form-control bg-dark text-white border-secondary" id="departure_date"
+                            required>
+                    </div>
+                    <div class="col-12">
+                        <label for="children_count" class="form-label">Number of Children</label>
+                        <input type="number" class="form-control bg-dark text-white border-secondary"
+                            id="children_count" min="0" value="0" required>
+                    </div>
+                    <div class="col-12">
+                        <label for="food_restrictions" class="form-label">Food Restrictions / Allergies</label>
+                        <textarea class="form-control bg-dark text-white border-secondary" id="food_restrictions"
+                            rows="3" placeholder="Vegetarian, Gluten-free, etc."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="note" class="form-label">Additional Note</label>
+                        <textarea class="form-control bg-dark text-white border-secondary" id="note"
+                            rows="3"></textarea>
+                    </div>
+                    <div class="col-12 text-center mt-4">
+                        <button type="submit" class="button purple big w-100">
+                            Submit Registration
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div id="form-message" class="mt-3 text-center" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        // const API_BASE_URL = 'http://localhost:8080'; 
+        const API_BASE_URL = 'https://api.garage-trip.cz';
+
+        const loadingDiv = document.getElementById('auth-loading');
+        const unauthorizedDiv = document.getElementById('auth-unauthorized');
+        const authorizedDiv = document.getElementById('auth-authorized');
+        const userDisplayName = document.getElementById('user-display-name');
+        const registrationForm = document.getElementById('registration-form');
+        const formMessage = document.getElementById('form-message');
+        const discordLoginLink = document.getElementById('discord-login-link');
+
+        if (discordLoginLink) {
+            discordLoginLink.href = `${API_BASE_URL}/auth/discord/login`;
+        }
+
+        async function checkAuth() {
+            try {
+                // Fetch user data from /me endpoint
+                // Note: credentials are sent automatically if auth_token cookie is present
+                const response = await fetch(`${API_BASE_URL}/me`, {
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'include'
+                });
+
+                if (response.status === 200) {
+                    const data = await response.json();
+                    userDisplayName.textContent = data.username;
+
+                    // Show authorized content
+                    loadingDiv.style.display = 'none';
+                    authorizedDiv.style.display = 'flex';
+
+                    // Pre-fill form if registration exists
+                    if (data.registration) {
+                        const reg = data.registration;
+                        document.getElementById('arrival_date').value = reg.arrival_date.split('T')[0];
+                        document.getElementById('departure_date').value = reg.departure_date.split('T')[0];
+                        document.getElementById('children_count').value = reg.children_count;
+                        document.getElementById('food_restrictions').value = reg.food_restrictions;
+                        document.getElementById('note').value = reg.note;
+                    }
+                } else if (response.status === 401) {
+                    // Show unauthorized UI with login button
+                    loadingDiv.style.display = 'none';
+                    unauthorizedDiv.style.display = 'flex';
+                } else {
+                    throw new Error('Unexpected status: ' + response.status);
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                loadingDiv.innerHTML = `
+                    <div class="box text-danger">
+                        <h3>Error;</h3>
+                        <p>Something went wrong while checking your authentication status. Please try again later.</p>
+                        <button class="button light mt-3" onclick="location.reload()">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        registrationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            formMessage.style.display = 'none';
+            formMessage.className = 'mt-3 text-center text-info';
+            formMessage.textContent = 'Submitting registration...';
+            formMessage.style.display = 'block';
+
+            const payload = {
+                arrival_date: new Date(document.getElementById('arrival_date').value).toISOString(),
+                departure_date: new Date(document.getElementById('departure_date').value).toISOString(),
+                children_count: parseInt(document.getElementById('children_count').value, 10),
+                food_restrictions: document.getElementById('food_restrictions').value || "",
+                cancelled: false,
+                note: document.getElementById('note').value || ""
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    formMessage.className = 'mt-3 text-center text-success';
+                    formMessage.textContent = 'Registration successful!';
+                } else {
+                    const errData = await response.json();
+                    formMessage.className = 'mt-3 text-center text-danger';
+                    formMessage.textContent = 'Registration failed: ' + (errData.detail || response.statusText);
+                }
+            } catch (error) {
+                console.error('Registration failed:', error);
+                formMessage.className = 'mt-3 text-center text-danger';
+                formMessage.textContent = 'Network error. Please try again.';
+            }
+        });
+
+        // Initialize auth check
+        checkAuth();
+    });
+</script>
+
+<style>
+    .form-control:focus {
+        background-color: #1a1a1a;
+        color: white;
+        border-color: #5865F2;
+        box-shadow: 0 0 0 0.25rem rgba(88, 101, 242, 0.25);
+    }
+
+    .form-label {
+        font-weight: bold;
+        color: #b9bbbe;
+    }
+</style>
