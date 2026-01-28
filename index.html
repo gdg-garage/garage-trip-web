@@ -7,7 +7,7 @@ id: home
     <div class="row text-center">
         <h1 class="mb-3 home-header">garage::<span class="secondary-color">trip</span>::<span
                 class="secondary-color">7.0.0</span></h1>
-        <p><em>Something is cooking.</em></p>
+        <p><em id="subtitle-rotation" style="min-height: 1.5em; display: inline-block;">&nbsp;</em></p>
     </div>
 
     <!-- TODO -->
@@ -283,4 +283,92 @@ id: home
             imageModal.show();
         });
     });
+
+    // Subtitle Rotation Logic
+    class TextScramble {
+        constructor(el) {
+            this.el = el
+            this.chars = '!<>-_\\/[]{}—=+*^?#________'
+            this.update = this.update.bind(this)
+        }
+        setText(newText) {
+            const oldText = this.el.innerText
+            const length = Math.max(oldText.length, newText.length)
+            const promise = new Promise((resolve) => this.resolve = resolve)
+            this.queue = []
+            for (let i = 0; i < length; i++) {
+                const from = oldText[i] || ''
+                const to = newText[i] || ''
+                const start = Math.floor(Math.random() * 40)
+                const end = start + Math.floor(Math.random() * 40)
+                this.queue.push({ from, to, start, end })
+            }
+            cancelAnimationFrame(this.frameRequest)
+            this.frame = 0
+            this.update()
+            return promise
+        }
+        update() {
+            let output = ''
+            let complete = 0
+            for (let i = 0, n = this.queue.length; i < n; i++) {
+                let { from, to, start, end, char } = this.queue[i]
+                if (this.frame >= end) {
+                    complete++
+                    output += to
+                } else if (this.frame >= start) {
+                    if (!char || Math.random() < 0.28) {
+                        char = this.randomChar()
+                        this.queue[i].char = char
+                    }
+                    // Use the site's secondary-color dynamically
+                    const secondaryColor = getComputedStyle(document.querySelector('.secondary-color')).color;
+                    output += `<span class="dud" style="color: ${secondaryColor}; text-shadow: 0 0 5px ${secondaryColor};">${char}</span>`
+                } else {
+                    output += from
+                }
+            }
+            this.el.innerHTML = output
+            if (complete === this.queue.length) {
+                this.resolve()
+            } else {
+                this.frameRequest = requestAnimationFrame(this.update)
+                this.frame++
+            }
+        }
+        randomChar() {
+            return this.chars[Math.floor(Math.random() * this.chars.length)]
+        }
+    }
+
+    const phrases = [
+        'Shaken not Stirred.',
+        'Seven Sins, No Regrets.',
+        'Licensed to Code.',
+        'Lucky seven.',
+        'The Seventh Wonder.'
+    ]
+
+    const el = document.getElementById('subtitle-rotation')
+    const fx = new TextScramble(el)
+
+    let counter = 0
+    const next = () => {
+        // Pick a random phrase that isn't the current one (optional, or just sequential)
+        // The user asked for "random other one"
+        let nextIndex = Math.floor(Math.random() * phrases.length)
+        // Ensure we don't pick the same one twice in a row if there's more than one option
+        if (phrases.length > 1) {
+            while (phrases[nextIndex] === el.innerText) {
+                nextIndex = Math.floor(Math.random() * phrases.length)
+            }
+        }
+
+        fx.setText(phrases[nextIndex]).then(() => {
+            setTimeout(next, 3000)
+        })
+    }
+
+    // Start rotation immediately
+    next()
 </script>
