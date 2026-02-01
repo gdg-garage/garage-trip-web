@@ -10,15 +10,14 @@ id: home
         <p><em id="subtitle-rotation" style="min-height: 1.5em; display: inline-block;">&nbsp;</em></p>
     </div>
 
-    <!-- TODO -->
     <div class="home-actions">
-        <!-- {% include button-link.html
-            url="https://forms.gle/VVTcqsUrWKvuSpXx6"
-            text="join the event"
-            icon="event"
-            variant="purple"
-            size="big"
-        %} -->
+        {% include button-link.html
+        url="/register"
+        text="join the event"
+        icon="event"
+        variant="purple"
+        size="big"
+        %}
         {% include button-link.html
         url="https://discord.com/invite/TnaMJMyTDw"
         text="join our Discord"
@@ -32,11 +31,11 @@ id: home
 <div class="row gy-3 mb-4">
     <div class="col-lg-4">
         <div class="box info-box">
+            <!-- TODO -->
             <!-- <img class="info-box-bg illu-calendar" src="/assets/svg/illu-calendar.svg" width="384" height="284" /> -->
             <div class="info-box-inner">
                 <h3>Save the date;</h3>
                 <p class="subtitle">12&nbsp;–&nbsp;19&nbsp;/&nbsp;9&nbsp;/&nbsp;2026</p>
-                <!-- TODO -->
                 <div class="info-box-inner-footer">
                     {% include button-link.html
                     url="https://evt.to/7055f4tvpvlh"
@@ -96,14 +95,18 @@ id: home
     </div>
 </div>
 
-<!-- TODO -->
 <div class="row mb-4">
     <div class="col">
         <div class="box">
             <h3>Invitation</h3>
 
-            <p>We’re cooking up Version 7 for you. Same place as last time. Save the date and stay tuned for details!
-            </p>
+            <ul>
+                <li><strong>Major version update</strong>: from <a href="/history" target="_blank">six</a> to seven ...
+                    6🤷7</li>
+                <li><strong>Legacy Support</strong>: All your favorite friends and puzzles remain fully compatible.</li>
+                <li><strong>Multi-generational Mode</strong>: The kid-friendly plugin is still enabled.</li>
+                <li><strong>Performance Tweak</strong>: Optimized for maximum nerdy joy and minimum sleep.</li>
+            </ul>
         </div>
     </div>
 </div>
