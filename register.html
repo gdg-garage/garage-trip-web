@@ -35,35 +35,74 @@ id: register
         <div class="box">
             <h3>Register for Event 7.0.0;</h3>
             <p>Welcome, <span id="user-display-name" class="secondary-color"></span>!</p>
+
+            <div id="registration-status-area" class="mt-4 p-3 border border-secondary rounded bg-dark mb-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div>
+                        <span class="text-secondary">Joining:</span>
+                        <span id="joining-status-text" class="monospace secondary-color ms-2">awaiting response;</span>
+                    </div>
+                    <div id="payment-status-container" style="display: none;">
+                        <span class="text-secondary">Payment:</span>
+                        <span id="payment-status-text" class="monospace ms-2"></span>
+                    </div>
+                </div>
+                <div id="payment-disclaimer" class="mt-2 small" style="display: none;">
+                    <i class="bi bi-info-circle"></i> For registration you need to pay 3000 CZK. <a href="/payment"
+                        class="secondary-color">More info</a>
+                </div>
+            </div>
+
             <hr class="my-4 border-secondary">
 
             <form id="registration-form" class="mt-4">
                 <div class="row gy-4">
-                    <div class="col-md-6">
-                        <label for="arrival_date" class="form-label">Arrival Date</label>
-                        <input type="date" class="form-control bg-dark text-white border-secondary" id="arrival_date"
-                            required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="departure_date" class="form-label">Departure Date</label>
-                        <input type="date" class="form-control bg-dark text-white border-secondary" id="departure_date"
-                            required>
-                    </div>
                     <div class="col-12">
-                        <label for="children_count" class="form-label">Number of Children</label>
-                        <input type="number" class="form-control bg-dark text-white border-secondary"
-                            id="children_count" min="0" value="0" required>
+                        <label class="form-label d-block mb-3">Are you joining the event?</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="joining_status" id="joining_yes"
+                                    value="yes" required>
+                                <label class="form-check-label text-white" for="joining_yes">yes</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="joining_status" id="joining_no"
+                                    value="no" required>
+                                <label class="form-check-label text-white" for="joining_no">no</label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-12">
-                        <label for="food_restrictions" class="form-label">Food Restrictions / Allergies</label>
-                        <textarea class="form-control bg-dark text-white border-secondary" id="food_restrictions"
-                            rows="3" placeholder="Vegetarian, Gluten-free, etc."></textarea>
+
+                    <!-- Additional options visible only if joining is yes -->
+                    <div id="registration-details" class="row gy-4 mx-0 px-0" style="display: none;">
+                        <div class="col-md-6">
+                            <label for="arrival_date" class="form-label">Arrival Date</label>
+                            <input type="date" class="form-control bg-dark text-white border-secondary"
+                                id="arrival_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="departure_date" class="form-label">Departure Date</label>
+                            <input type="date" class="form-control bg-dark text-white border-secondary"
+                                id="departure_date">
+                        </div>
+                        <div class="col-12">
+                            <label for="children_count" class="form-label">Number of Children</label>
+                            <input type="number" class="form-control bg-dark text-white border-secondary"
+                                id="children_count" min="0" value="0">
+                        </div>
+                        <div class="col-12">
+                            <label for="food_restrictions" class="form-label">Food Restrictions / Allergies</label>
+                            <textarea class="form-control bg-dark text-white border-secondary" id="food_restrictions"
+                                rows="3" placeholder="Vegetarian, Gluten-free, etc."></textarea>
+                        </div>
                     </div>
+
                     <div class="col-12">
                         <label for="note" class="form-label">Additional Note</label>
                         <textarea class="form-control bg-dark text-white border-secondary" id="note"
                             rows="3"></textarea>
                     </div>
+
                     <div class="col-12 text-center mt-4">
                         <button type="submit" class="button purple big w-100">
                             Submit Registration
@@ -89,14 +128,52 @@ id: register
         const formMessage = document.getElementById('form-message');
         const discordLoginLink = document.getElementById('discord-login-link');
 
+        const joiningStatusText = document.getElementById('joining-status-text');
+        const registrationDetails = document.getElementById('registration-details');
+        const paymentStatusContainer = document.getElementById('payment-status-container');
+        const paymentStatusText = document.getElementById('payment-status-text');
+        const paymentDisclaimer = document.getElementById('payment-disclaimer');
+        const joiningYes = document.getElementById('joining_yes');
+        const joiningNo = document.getElementById('joining_no');
+
         if (discordLoginLink) {
             discordLoginLink.href = `${API_BASE_URL}/auth/discord/login`;
         }
 
+        function updateUIForJoiningStatus(status) {
+            if (status === 'yes') {
+                joiningStatusText.textContent = 'registered;';
+                joiningStatusText.className = 'monospace text-success ms-2';
+                registrationDetails.style.display = 'flex';
+                document.getElementById('arrival_date').required = true;
+                document.getElementById('departure_date').required = true;
+                document.getElementById('children_count').required = true;
+
+                paymentStatusContainer.style.display = 'block';
+            } else if (status === 'no') {
+                joiningStatusText.textContent = 'NOT registered;';
+                joiningStatusText.className = 'monospace text-danger ms-2';
+                registrationDetails.style.display = 'none';
+                document.getElementById('arrival_date').required = false;
+                document.getElementById('departure_date').required = false;
+                document.getElementById('children_count').required = false;
+
+                paymentStatusContainer.style.display = 'none';
+                paymentDisclaimer.style.display = 'none';
+            } else {
+                joiningStatusText.textContent = 'awaiting response;';
+                joiningStatusText.className = 'monospace secondary-color ms-2';
+                registrationDetails.style.display = 'none';
+                paymentStatusContainer.style.display = 'none';
+                paymentDisclaimer.style.display = 'none';
+            }
+        }
+
+        joiningYes.addEventListener('change', () => updateUIForJoiningStatus('yes'));
+        joiningNo.addEventListener('change', () => updateUIForJoiningStatus('no'));
+
         async function checkAuth() {
             try {
-                // Fetch user data from /me endpoint
-                // Note: credentials are sent automatically if auth_token cookie is present
                 const response = await fetch(`${API_BASE_URL}/me`, {
                     headers: { 'Accept': 'application/json' },
                     credentials: 'include'
@@ -110,17 +187,40 @@ id: register
                     loadingDiv.style.display = 'none';
                     authorizedDiv.style.display = 'flex';
 
+                    // Payment status
+                    if (data.paid) {
+                        paymentStatusText.textContent = 'paid;';
+                        paymentStatusText.className = 'monospace text-success ms-2';
+                        paymentDisclaimer.style.display = 'none';
+                    } else {
+                        paymentStatusText.textContent = 'payment pending;';
+                        paymentStatusText.className = 'monospace text-warning ms-2';
+                    }
+
                     // Pre-fill form if registration exists
                     if (data.registration) {
                         const reg = data.registration;
-                        document.getElementById('arrival_date').value = reg.arrival_date.split('T')[0];
-                        document.getElementById('departure_date').value = reg.departure_date.split('T')[0];
-                        document.getElementById('children_count').value = reg.children_count;
-                        document.getElementById('food_restrictions').value = reg.food_restrictions;
-                        document.getElementById('note').value = reg.note;
+                        if (reg.cancelled) {
+                            joiningNo.checked = true;
+                            updateUIForJoiningStatus('no');
+                        } else {
+                            joiningYes.checked = true;
+                            updateUIForJoiningStatus('yes');
+
+                            if (!data.paid) {
+                                paymentDisclaimer.style.display = 'block';
+                            }
+
+                            if (reg.arrival_date) document.getElementById('arrival_date').value = reg.arrival_date.split('T')[0];
+                            if (reg.departure_date) document.getElementById('departure_date').value = reg.departure_date.split('T')[0];
+                            document.getElementById('children_count').value = reg.children_count || 0;
+                            document.getElementById('food_restrictions').value = reg.food_restrictions || "";
+                        }
+                        document.getElementById('note').value = reg.note || "";
+                    } else {
+                        updateUIForJoiningStatus('awaiting');
                     }
                 } else if (response.status === 401) {
-                    // Show unauthorized UI with login button
                     loadingDiv.style.display = 'none';
                     unauthorizedDiv.style.display = 'flex';
                 } else {
@@ -145,12 +245,14 @@ id: register
             formMessage.textContent = 'Submitting registration...';
             formMessage.style.display = 'block';
 
+            const isJoining = joiningYes.checked;
+
             const payload = {
-                arrival_date: new Date(document.getElementById('arrival_date').value).toISOString(),
-                departure_date: new Date(document.getElementById('departure_date').value).toISOString(),
-                children_count: parseInt(document.getElementById('children_count').value, 10),
-                food_restrictions: document.getElementById('food_restrictions').value || "",
-                cancelled: false,
+                arrival_date: isJoining ? new Date(document.getElementById('arrival_date').value).toISOString() : new Date().toISOString(),
+                departure_date: isJoining ? new Date(document.getElementById('departure_date').value).toISOString() : new Date().toISOString(),
+                children_count: isJoining ? parseInt(document.getElementById('children_count').value, 10) : 0,
+                food_restrictions: isJoining ? (document.getElementById('food_restrictions').value || "") : "",
+                cancelled: !isJoining,
                 note: document.getElementById('note').value || ""
             };
 
@@ -167,7 +269,24 @@ id: register
 
                 if (response.ok) {
                     formMessage.className = 'mt-3 text-center text-success';
-                    formMessage.textContent = 'Registration successful!';
+                    formMessage.textContent = 'Registration updated successfully!';
+
+                    // Update status banner
+                    updateUIForJoiningStatus(isJoining ? 'yes' : 'no');
+                    if (isJoining) {
+                        // Refresh payment disclaimer visibility
+                        const meResponse = await fetch(`${API_BASE_URL}/me`, { credentials: 'include' });
+                        if (meResponse.ok) {
+                            const meData = await meResponse.json();
+                            if (!meData.paid) {
+                                paymentDisclaimer.style.display = 'block';
+                            } else {
+                                paymentDisclaimer.style.display = 'none';
+                                paymentStatusText.textContent = 'paid;';
+                                paymentStatusText.className = 'monospace text-success ms-2';
+                            }
+                        }
+                    }
                 } else {
                     const errData = await response.json();
                     formMessage.className = 'mt-3 text-center text-danger';
