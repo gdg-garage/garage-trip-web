@@ -37,19 +37,24 @@ id: register
             <p>Welcome, <span id="user-display-name" class="secondary-color"></span>!</p>
 
             <div id="registration-status-area" class="mt-4 p-3 border border-secondary rounded bg-dark mb-4">
-                <div class="d-flex justify-content-between align-items-center flex-wrap">
-                    <div>
-                        <span class="text-secondary">Joining:</span>
-                        <span id="joining-status-text" class="monospace secondary-color ms-2">awaiting response;</span>
+                <div class="row gy-2">
+                    <div class="col-12 d-flex justify-content-between">
+                        <div>
+                            <span class="text-secondary">Joining:</span>
+                            <span id="joining-status-text" class="monospace secondary-color ms-2">awaiting
+                                response;</span>
+                        </div>
                     </div>
-                    <div id="payment-status-container" style="display: none;">
-                        <span class="text-secondary">Payment:</span>
-                        <span id="payment-status-text" class="monospace ms-2"></span>
+                    <div id="payment-status-container" class="col-12 d-flex justify-content-between"
+                        style="display: none !important;">
+                        <div>
+                            <span class="text-secondary">Payment:</span>
+                            <span id="payment-status-text" class="monospace ms-2"></span>
+                        </div>
+                        <a href="/payment" class="secondary-color small">
+                            payment info
+                        </a>
                     </div>
-                </div>
-                <div id="payment-disclaimer" class="mt-2 small" style="display: none;">
-                    <i class="bi bi-info-circle"></i> For registration you need to pay 3000 CZK. <a href="/payment"
-                        class="secondary-color">More info</a>
                 </div>
             </div>
 
@@ -117,8 +122,8 @@ id: register
 
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
-        // const API_BASE_URL = 'http://localhost:8080'; 
-        const API_BASE_URL = 'https://api.garage-trip.cz';
+        const API_BASE_URL = 'http://localhost:8080';
+        // const API_BASE_URL = 'https://api.garage-trip.cz';
 
         const loadingDiv = document.getElementById('auth-loading');
         const unauthorizedDiv = document.getElementById('auth-unauthorized');
@@ -132,9 +137,10 @@ id: register
         const registrationDetails = document.getElementById('registration-details');
         const paymentStatusContainer = document.getElementById('payment-status-container');
         const paymentStatusText = document.getElementById('payment-status-text');
-        const paymentDisclaimer = document.getElementById('payment-disclaimer');
         const joiningYes = document.getElementById('joining_yes');
         const joiningNo = document.getElementById('joining_no');
+
+        const EVENT_ID = 'g::t::7.0.0';
 
         if (discordLoginLink) {
             discordLoginLink.href = `${API_BASE_URL}/auth/discord/login`;
@@ -149,7 +155,8 @@ id: register
                 document.getElementById('departure_date').required = true;
                 document.getElementById('children_count').required = true;
 
-                paymentStatusContainer.style.display = 'block';
+                paymentStatusContainer.classList.remove('d-none');
+                paymentStatusContainer.style.setProperty('display', 'flex', 'important');
             } else if (status === 'no') {
                 joiningStatusText.textContent = 'NOT registered;';
                 joiningStatusText.className = 'monospace text-danger ms-2';
@@ -158,14 +165,12 @@ id: register
                 document.getElementById('departure_date').required = false;
                 document.getElementById('children_count').required = false;
 
-                paymentStatusContainer.style.display = 'none';
-                paymentDisclaimer.style.display = 'none';
+                paymentStatusContainer.style.setProperty('display', 'none', 'important');
             } else {
                 joiningStatusText.textContent = 'awaiting response;';
                 joiningStatusText.className = 'monospace secondary-color ms-2';
                 registrationDetails.style.display = 'none';
-                paymentStatusContainer.style.display = 'none';
-                paymentDisclaimer.style.display = 'none';
+                paymentStatusContainer.style.setProperty('display', 'none', 'important');
             }
         }
 
@@ -174,7 +179,7 @@ id: register
 
         async function checkAuth() {
             try {
-                const response = await fetch(`${API_BASE_URL}/me`, {
+                const response = await fetch(`${API_BASE_URL}/me?event=${EVENT_ID}`, {
                     headers: { 'Accept': 'application/json' },
                     credentials: 'include'
                 });
@@ -191,32 +196,31 @@ id: register
                     if (data.paid) {
                         paymentStatusText.textContent = 'paid;';
                         paymentStatusText.className = 'monospace text-success ms-2';
-                        paymentDisclaimer.style.display = 'none';
                     } else {
                         paymentStatusText.textContent = 'payment pending;';
                         paymentStatusText.className = 'monospace text-warning ms-2';
                     }
 
                     // Pre-fill form if registration exists
-                    if (data.registration) {
-                        const reg = data.registration;
-                        if (reg.cancelled) {
-                            joiningNo.checked = true;
-                            updateUIForJoiningStatus('no');
-                        } else {
-                            joiningYes.checked = true;
-                            updateUIForJoiningStatus('yes');
+                    if (data.registrations && data.registrations.length > 0) {
+                        const reg = data.registrations.find(r => r.event === EVENT_ID);
+                        if (reg) {
+                            if (reg.cancelled) {
+                                joiningNo.checked = true;
+                                updateUIForJoiningStatus('no');
+                            } else {
+                                joiningYes.checked = true;
+                                updateUIForJoiningStatus('yes');
 
-                            if (!data.paid) {
-                                paymentDisclaimer.style.display = 'block';
+                                if (reg.arrival_date) document.getElementById('arrival_date').value = reg.arrival_date.split('T')[0];
+                                if (reg.departure_date) document.getElementById('departure_date').value = reg.departure_date.split('T')[0];
+                                document.getElementById('children_count').value = reg.children_count || 0;
+                                document.getElementById('food_restrictions').value = reg.food_restrictions || "";
                             }
-
-                            if (reg.arrival_date) document.getElementById('arrival_date').value = reg.arrival_date.split('T')[0];
-                            if (reg.departure_date) document.getElementById('departure_date').value = reg.departure_date.split('T')[0];
-                            document.getElementById('children_count').value = reg.children_count || 0;
-                            document.getElementById('food_restrictions').value = reg.food_restrictions || "";
+                            document.getElementById('note').value = reg.note || "";
+                        } else {
+                            updateUIForJoiningStatus('awaiting');
                         }
-                        document.getElementById('note').value = reg.note || "";
                     } else {
                         updateUIForJoiningStatus('awaiting');
                     }
@@ -253,7 +257,8 @@ id: register
                 children_count: isJoining ? parseInt(document.getElementById('children_count').value, 10) : 0,
                 food_restrictions: isJoining ? (document.getElementById('food_restrictions').value || "") : "",
                 cancelled: !isJoining,
-                note: document.getElementById('note').value || ""
+                note: document.getElementById('note').value || "",
+                event: EVENT_ID
             };
 
             try {
@@ -274,16 +279,15 @@ id: register
                     // Update status banner
                     updateUIForJoiningStatus(isJoining ? 'yes' : 'no');
                     if (isJoining) {
-                        // Refresh payment disclaimer visibility
-                        const meResponse = await fetch(`${API_BASE_URL}/me`, { credentials: 'include' });
+                        const meResponse = await fetch(`${API_BASE_URL}/me?event=${EVENT_ID}`, { credentials: 'include' });
                         if (meResponse.ok) {
                             const meData = await meResponse.json();
-                            if (!meData.paid) {
-                                paymentDisclaimer.style.display = 'block';
-                            } else {
-                                paymentDisclaimer.style.display = 'none';
+                            if (meData.paid) {
                                 paymentStatusText.textContent = 'paid;';
                                 paymentStatusText.className = 'monospace text-success ms-2';
+                            } else {
+                                paymentStatusText.textContent = 'payment pending;';
+                                paymentStatusText.className = 'monospace text-warning ms-2';
                             }
                         }
                     }
