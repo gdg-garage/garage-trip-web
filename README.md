@@ -1,6 +1,6 @@
 # garage-trip-web
 
-A web application for Garage Trip event.
+A web application for the Garage Trip event.
 
 ## Technologies
 * Node.js
@@ -11,10 +11,10 @@ A web application for Garage Trip event.
 
 ## Steps
 1. `corepack enable` - enables corepack for project
-2. `corepack install` - gets yarn package
-3. `yarn install` - installs depedencies
-4. `yarn run gulp` - create assets (images)
-5. `jekyll serve` - runs server on http://127.0.0.1:4000
+2. `corepack install` - installs the yarn package
+3. `yarn install` - installs dependencies
+4. `yarn run gulp` - creates assets (images)
+5. `jekyll serve` - runs the server on http://127.0.0.1:4000
 
 
 ## Troubleshooting
