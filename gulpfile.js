@@ -14,7 +14,7 @@ function images(cb) {
     src('_images/*.{jpg,jpeg,png}', {encoding: false})
       .pipe(imageResize({ width: size }))
       .pipe(webp())
-      .pipe(dest(`assets/images/${size}/`))
+      .pipe(dest(`assets/images/${size}/`));
   });
   cb();
 }
