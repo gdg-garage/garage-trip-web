@@ -1,0 +1,22 @@
+---
+import Default from '../layouts/Default.astro';
+import RegisterForm from '../components/RegisterForm';
+---
+
+<Default title="Register" activeId="register">
+  <RegisterForm client:load />
+</Default>
+
+<style>
+  :global(.form-control:focus) {
+    background-color: #1a1a1a;
+    color: white;
+    border-color: #5865f2;
+    box-shadow: 0 0 0 0.25rem rgba(88, 101, 242, 0.25);
+  }
+
+  :global(.form-label) {
+    font-weight: bold;
+    color: #b9bbbe;
+  }
+</style>

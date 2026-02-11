@@ -1,0 +1,70 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/main.scss';
+
+interface Props {
+  title: string;
+  activeId?: string;
+}
+
+const { title, activeId } = Astro.props;
+const gaId = import.meta.env.PUBLIC_GA_ID || 'G-TF98L99080';
+---
+
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} | Garage Trip</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+  </head>
+
+  <!-- Google tag (gtag.js) -->
+  <script is:inline define:vars={{ gaId }}>
+    // Inject GA script tag dynamically
+    (function () {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
+      document.head.appendChild(s);
+    })();
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', gaId);
+  </script>
+
+  <!-- Bootstrap JS from CDN -->
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+
+  <body class="d-flex flex-column">
+    <Header activeId={activeId} />
+    <div class="main-container container">
+      <section class="content">
+        <slot />
+      </section>
+    </div>
+    <Footer />
+    <div class="background-pattern">
+      <div class="background-pattern-inner"></div>
+    </div>
+  </body>
+</html>

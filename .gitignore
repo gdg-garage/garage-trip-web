@@ -1,4 +1,16 @@
+# Dependencies
 node_modules
+
+# Astro build output
+dist/
+.astro/
+
+# Jekyll (legacy - can remove after full migration)
 _site
 .sass-cache
+
+# Environment
+.env
+
+# Editor
 .vscode

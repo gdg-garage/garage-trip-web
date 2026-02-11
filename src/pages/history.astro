@@ -1,0 +1,517 @@
+---
+import Default from '../layouts/Default.astro';
+---
+
+<Default title="History" activeId="history">
+  <div class="row mt-4">
+    <h3>About the Event</h3>
+    <div class="col-lg-6 gy-2">
+      <div class="box">
+        <p>
+          This trip is an initiative of <a href="https://sites.google.com/site/garagepragueone"
+            >GDG Garage Prague One</a
+          > attendees.
+        </p>
+        <p>
+          We felt that more time and focus were needed for some algorithmic tasks that we tried to
+          solve at weekly GDG Garage meetings.
+        </p>
+        <p>Garage Trip is non-profit event powered by sheer joy of the organizers and attendees.</p>
+      </div>
+    </div>
+    <div class="col-lg-6 gy-2">
+      <div class="box">
+        <p>The aim of the trip is to have fun and relax, which is supported by:</p>
+        <ul>
+          <li>Solving algorithmic tasks (alone or in teams)</li>
+          <li>Outdoor games</li>
+          <li>LAN party</li>
+          <li>Board games</li>
+          <li>Logic (ciphering) games - puzzle hunt, escape game</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="row pt-3">
+    <h3>Past Events</h3>
+
+    <div class="col-lg-6 gy-2">
+      <div class="box">
+        <h3>6.9 | 2025</h3>
+        <table>
+          <tr>
+            <td>Attendees</td>
+            <td>25 (+3 kids) (4 newcomers)</td>
+          </tr>
+          <tr>
+            <td>Place</td>
+            <td
+              ><a
+                href="https://www.novysvetlipka.cz/ubytovani-chalupa-novy-svet-prostredni-lipka-orlicke-hory.html"
+                >Novy Svet</a
+              ></td
+            >
+          </tr>
+          <tr>
+            <td>When</td>
+            <td>20.-27.9.2025</td>
+          </tr>
+          <tr>
+            <td>Resources</td>
+            <td>
+              <a href="/history/garage-trip-6-9">Invitation</a>,{' '}
+              <a href="/assets/pdf/GT6_cipher.pdf">invite cipher</a>
+            </td>
+          </tr>
+        </table>
+
+        <h4>Highlights</h4>
+        <ul>
+          <li>We chose an absolutely amazing venue</li>
+          <ul>
+            <li>
+              Even though we scraped the accomodation listing website so hard we got blocked
+            </li>
+            <li>
+              We used <a
+                href="https://github.com/gdg-garage/garage-trip-accommodation-scraper/blob/main/rank.py"
+                >LLMs for rating the venues</a
+              > (via Ollama)
+            </li>
+            <li>
+              We changed the design of our website and created a logo, see our <a href="/design"
+                >design guidelines</a
+              >
+            </li>
+            <li>Never ending Whirpool and Sauna sessions</li>
+          </ul>
+          <li>
+            We used LLMs for feedback processing and we focused on fixing the the painpoints like
+            preparing food, chores and less packed schedule
+          </li>
+          <ul>
+            <li>
+              <a href="https://github.com/gdg-garage/garage-trip-chores" target="_blank"
+                >Discord Chores bot</a
+              > helping us to stay organized and keeping the chores load balanced{' '}
+              <a href="/assets/images/gt_69_chores_distribution.png" target="_blank">Fig 1</a>{' '}
+              <a href="/assets/images/gt_69_chores_pct.png" target="_blank">Fig 2</a>
+            </li>
+            <li>
+              Food was delicious and almost effortless and we did not skip traditional BBQ burgers
+              🍔 and pancakes 🥞
+            </li>
+            <li>
+              We had 5 taps, shisha master and bartender which resulted in most smoked hookahs in
+              any Garage Trip
+            </li>
+            <li>On Friday we rested and played some boards games</li>
+          </ul>
+          <li>
+            <a
+              href="https://docs.google.com/presentation/d/1cfiaPOQnDI-xPcTJguQdoFlImaMQ7B1CFjV-S0NAy-Q/edit"
+              target="_blank">Init presentation</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://docs.google.com/spreadsheets/d/1gD6NbIvg5FFI0QfVLmJaeonRlPUNV_6iw0Qitt52iv8/edit?gid=1073066417#gid=1073066417"
+              target="_blank">Barcamp</a
+            >
+          </li>
+          <ul>
+            <li>Soldering workshop</li>
+            <li>Guess the ingredient tasting competition</li>
+            <li>Hookah presentation and workshop</li>
+            <li>
+              presentations: house renovation experience, photos and experiences from around the
+              world, <a
+                href="https://docs.google.com/presentation/d/1uEPuA4aOLfXvZ43f0NoFFxFycPtgsrAxkYmeOZTDuxM/edit?usp=sharing"
+                target="_blank">off-grid sauna</a
+              >, <a
+                href="https://docs.google.com/presentation/d/1FIwl2-Np3CqeRBva8_K3plIxv4h6_EwCrZ-CYX3zX7E/edit?slide=id.p#slide=id.p"
+                target="_blank">jj-vcs</a
+              >, <a
+                href="https://docs.google.com/presentation/d/11rzzUPp3aUxfuzZfaGOn2EteNT2xmX87GggJ_GaZz08/edit"
+                target="_blank">eBPF</a
+              >, AMA Google, <a
+                href="https://docs.google.com/presentation/d/1G49Xmu4DaUWy0kX0fExfsCdROBfXiN_R5wxfzhiJvsY/edit?usp=sharing"
+                target="_blank">LARP</a
+              >, <a
+                href="https://docs.google.com/presentation/d/1zzLJPE19RRiQeX84v4qtVZ-c44Y26gCwrtB7U03Rd9I/edit"
+                target="_blank">the best RPG</a
+              >
+            </li>
+          </ul>
+          <li>
+            <a
+              href="https://docs.google.com/presentation/d/19SEO8OGYCwQX-XzIvq0COwnO517qQIajEnahMNlrSb8/edit?slide=id.g37ee8342338_0_12#slide=id.g37ee8342338_0_12"
+              target="_blank">Unnatural Worlds</a
+            > AI bot programming using an improved API commented by{' '}
+            <a href="https://github.com/curusarn/uw-ai-yapper">AI yapper</a>
+          </li>
+          <li>
+            <a
+              href="https://docs.google.com/presentation/d/1NE27kPMeydsX6Ie0oiNMbqe2sNHKyWbLvApSe4rT7N4/edit?slide=id.g37c91a31dec_0_278#slide=id.g37c91a31dec_0_278"
+              target="_blank">Microbots</a
+            > (PicoGo Robot) - introduction to programming HW in Micro Python
+          </li>
+          <ul>
+            <li>
+              <a href="https://github.com/davidvavra/picogo-kids" target="_blank">picogo-kids</a>
+            </li>
+          </ul>
+          <li>
+            A visit to a <a href="https://www.tvrzbouda.cz/" target="_blank"
+              >Second World War underground bunker</a
+            >
+          </li>
+          <li>
+            LAN party including exploring a new race in{' '}
+            <a href="https://store.steampowered.com/app/2369780/Unnatural_Worlds/" target="_blank"
+              >Unnatural Worlds</a
+            >
+          </li>
+          <li>
+            <a href="https://github.com/liennie/sphinx" target="_blank">Async puzzle hunt</a>
+          </li>
+          <li>A birthday celebration</li>
+          <li>A lot of vibe coding</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-lg-6 gy-2">
+      <div class="box">
+        <h3>5.0 | 2024</h3>
+        <table>
+          <tr>
+            <td>Attendees</td>
+            <td>24 (+2 kids)</td>
+          </tr>
+          <tr>
+            <td>Place</td>
+            <td><a href="https://chalupasimia.cz/">https://chalupasimia.cz/</a></td>
+          </tr>
+          <tr>
+            <td>When</td>
+            <td>10.-17.8.2024</td>
+          </tr>
+          <tr>
+            <td>Resources</td>
+            <td>
+              <a href="/history/garage-trip-5-0">Invitation</a>,{' '}
+              <a
+                href="https://github.com/tivvit/garage-trip-invitation-cipher-5.0/blob/main/notes.pdf"
+                >invite cipher</a
+              >
+            </td>
+          </tr>
+        </table>
+
+        <h4>Highlights</h4>
+        <ul>
+          <li>International version (in English) for the first time.</li>
+          <li>
+            <a
+              href="https://docs.google.com/presentation/d/1ClPxODL56j38TIjbRfBaSCnJc_IWvnPMDj0wB4rHQo4/edit#slide=id.p"
+              >Initial presentation</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://docs.google.com/presentation/d/1wxB9jkWl9jOpdvXcu-2xkQ2wiAu_3p1ZyLx0X3-RvXQ/edit?usp=sharing"
+              >Outdoor Puzzle hunt</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://docs.google.com/presentation/d/1tI6EKJwvF-mP0u8engPONaHQG-Ck0sRjMBd4gfzaEnM/edit?usp=sharing"
+              >Movie trivia</a
+            > with trailers and quotes
+          </li>
+          <li>Outdoor - paintball</li>
+          <li>
+            <a
+              href="https://docs.google.com/presentation/d/1LIppQGsu7tQ8x2iwMZHOHfh1BighPxVuCnOpER8NKTo/edit?usp=sharing"
+              >OSINT challenge</a
+            > with ssh based UI
+          </li>
+          <li>
+            <a
+              href="https://drive.google.com/file/d/1B3Phagt2wZUfJU1yWdyujlqLoNt1ebol/view?usp=sharing"
+              >Night game</a
+            >
+          </li>
+          <ul>
+            <li>
+              <a href="https://github.com/Lim3nius/gt5qrserver/"
+                >https://github.com/Lim3nius/gt5qrserver/</a
+              >
+            </li>
+          </ul>
+          <li>
+            <a href="https://store.steampowered.com/app/2369780/Unnatural_Worlds/"
+              >Unnatural worlds</a
+            > - Competitive RTS played on unnatural shapes
+          </li>
+          <ul>
+            <li>
+              <a
+                href="https://docs.google.com/presentation/d/19Iv-3ILHQxh7-YdsuoZLoGoA-vCe_zWLnMHkCJIKRuA/edit?usp=sharing"
+                >Presentation</a
+              >
+            </li>
+            <li>Human Tournament</li>
+            <li>AI tournament</li>
+            <ul>
+              <li><a href="https://github.com/unnatural-worlds/uwapi">API</a></li>
+              <li>Bots</li>
+              <ul>
+                <li>
+                  <a href="https://github.com/Nialaren/uwapi-bot-unicrons"
+                    >https://github.com/Nialaren/uwapi-bot-unicrons</a
+                  >
+                </li>
+                <li>
+                  <a href="https://github.com/gdg-garage/uwapi-eve-david"
+                    >https://github.com/gdg-garage/uwapi-eve-david</a
+                  >
+                </li>
+                <li>
+                  <a href="https://github.com/curusarn/uw-bot-gt5"
+                    >https://github.com/curusarn/uw-bot-gt5</a
+                  >
+                </li>
+                <li>
+                  <a href="https://github.com/tivvit/ght5-uw-bot"
+                    >https://github.com/tivvit/ght5-uw-bot</a
+                  >
+                </li>
+              </ul>
+            </ul>
+          </ul>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-lg-6 gy-2">
+      <div class="box">
+        <h3>4.2 | 2023</h3>
+        <table>
+          <tr>
+            <td>Attendees</td>
+            <td>15</td>
+          </tr>
+          <tr>
+            <td>Place</td>
+            <td><a href="https://chalupasimia.cz/">https://chalupasimia.cz/</a></td>
+          </tr>
+          <tr>
+            <td>When</td>
+            <td>6.-14.10.2023</td>
+          </tr>
+          <tr>
+            <td>Resources</td>
+            <td>
+              <a href="/history/garage-trip-4-2">Invitation</a>,{' '}
+              <a
+                href="https://github.com/tivvit/garage-trip-4.2/blob/main/invite-cipher/out.png"
+                >invite cipher</a
+              >
+            </td>
+          </tr>
+        </table>
+
+        <h4>Highlights</h4>
+        <ul>
+          <li>
+            <a
+              href="https://docs.google.com/presentation/d/1UfUGNLWpGlQgSwtIZGgqZ8OCGDS4EhMAWOT4_u1fHwU/edit?usp=sharing"
+              >Solution for the invitation cipher using Markov Chains</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://docs.google.com/presentation/d/1JNyWMEFUSZsdHwJ5DV-stBNt4yqWbrgq40iPCSXM3Oc/edit#slide=id.g288ae4626af_0_18"
+              >History stats presentation</a
+            >
+          </li>
+          <li>Outdoor Puzzle hunt</li>
+          <li>
+            <a href="https://github.com/gdg-garage/gt3-az-kviz">AZ quiz</a> with new questions (partially
+            generated by AI)
+          </li>
+          <li>
+            <a
+              href="https://docs.google.com/presentation/d/1BBPPf0yfTjwC9YdxTx7DJKkWU1N0DXpRNzGb0-Bv5pw/edit?usp=sharing"
+              >Turing test</a
+            > - Detect AI (Gemini, OpenAI) among humans using chat interface
+          </li>
+          <li>
+            <a
+              href="https://docs.google.com/presentation/d/10mZ-e_mXZgcUWlYKYnkZbcK2KbK6UBDzz6z6oaPOZJk/edit?usp=sharing"
+              >Hash code</a
+            >
+          </li>
+          <li>Trivia - recognize movies and series based on music</li>
+          <li>Outdoor - paintball, rope park</li>
+          <li>
+            <a
+              href="https://docs.google.com/presentation/d/1NgFF8F4zonO04LEIRICL32j894egJsJfawboOwVbK_E/edit#slide=id.p"
+              >Night game</a
+            >
+          </li>
+          <li>
+            <a href="https://github.com/gdg-garage/dungeons-and-trolls/blob/main/README.md"
+              >Dungeons and Trolls</a
+            > - cooperative AI bot development game
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-lg-6 gy-2">
+      <div class="box">
+        <h3>3.0 | 2022</h3>
+        <table>
+          <tr>
+            <td>Attendees</td>
+            <td>22</td>
+          </tr>
+          <tr>
+            <td>Place</td>
+            <td><a href="http://www.treninkcentrum.cz/">http://www.treninkcentrum.cz/</a></td>
+          </tr>
+          <tr>
+            <td>When</td>
+            <td>2.9.-10.9.2022</td>
+          </tr>
+          <tr>
+            <td>Resources</td>
+            <td>
+              <a href="/history/v3">Invitation</a>,{' '}
+              <a href="https://github.com/tivvit/garage-trip-3.0/tree/main/invite-cipher"
+                >invite cipher</a
+              >
+            </td>
+          </tr>
+        </table>
+
+        <h4>Highlights</h4>
+        <ul>
+          <li>
+            <a href="https://github.com/gdg-garage/garage-trip-3.0-accommodation-scraper"
+              >Accommodation scraper</a
+            >, <a href="https://github.com/gdg-garage/Garage-trip-3.0-organization"
+              >Organized via Github Issues</a
+            >
+          </li>
+          <li><a href="https://github.com/gdg-garage/gt3-az-kviz">AZ quiz</a></li>
+          <li>
+            <a href="https://github.com/gdg-garage/space-tycoon">Space tycoon</a> - collaborative and
+            competitive AI bot development game
+          </li>
+          <li>
+            <a href="https://www.tepfactor.cz/cze/boyard/">TEPfactor - boyard</a>
+          </li>
+          <li>
+            <a
+              href="https://drive.google.com/drive/folders/1UbmIdHLtF1rru8rvMm6Qw9Dxzu8oIW2i?usp=sharing"
+              >Escape game</a
+            >
+          </li>
+          <li>
+            <a href="https://github.com/gdg-garage/gt3-night-puzzle-hunt">Night puzzle hunt</a>
+          </li>
+          <li>Garage Olympics</li>
+          <li>
+            Card game (<a
+              href="https://drive.google.com/file/d/1tfOAKOZBMVDIgvr4SVPi2iKDU8FLoz9_/view?usp=sharing"
+              >rules</a
+            >, <a
+              href="https://drive.google.com/file/d/1LB0TSe-eZZPItQ8955JtAxRRIYvtpNJX/view?usp=sharing"
+              >cards</a
+            >)
+          </li>
+          <li>Pool party</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-lg-6 gy-2">
+      <div class="box">
+        <h3>2.0 | 2021</h3>
+        <table>
+          <tr>
+            <td>Attendees</td>
+            <td>15</td>
+          </tr>
+          <tr>
+            <td>Place</td>
+            <td><a href="https://www.baba-jaga.cz/">https://www.baba-jaga.cz/</a></td>
+          </tr>
+          <tr>
+            <td>When</td>
+            <td>24.-29.9.2021</td>
+          </tr>
+        </table>
+
+        <h4>Highlights</h4>
+        <ul>
+          <li><a href="https://github.com/gdg-garage/garage-trip-2.0">Escape Game</a></li>
+          <li>Trip to fort Stachlberg</li>
+          <li>Clay pigeon shooting</li>
+          <li>Horse riding</li>
+          <li>Captain Sonar, Space Alert and other board games</li>
+          <li>
+            <a href="https://github.com/gdg-garage/garage-trip-2021-cipher-game">Puzzlehunt</a>
+          </li>
+          <li>Tesla test-drive (and crash)</li>
+          <li>Algo trivia</li>
+          <li>Roundnet, archery</li>
+          <li>Lockpicking</li>
+          <li>Hookah</li>
+          <li>Pizza party, BBQ</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-lg-6 gy-2">
+      <div class="box">
+        <h3>1.0 | 2020</h3>
+        <table>
+          <tr>
+            <td>Attendees</td>
+            <td>17</td>
+          </tr>
+          <tr>
+            <td>Place</td>
+            <td><a href="https://www.chatkyupotoka.cz/">https://www.chatkyupotoka.cz/</a></td>
+          </tr>
+          <tr>
+            <td>When</td>
+            <td>10.-13.9.2020</td>
+          </tr>
+        </table>
+
+        <h4>Highlights</h4>
+        <ul>
+          <li>
+            <a href="https://github.com/gdg-garage/garage-trip-2020-cipher-game"
+              >Outdoor puzzlehunt game</a
+            >
+          </li>
+          <li>LAN party (Bulánci, FlatOut, Warcraft 3, AoE II, Factorio)</li>
+          <li>DDR</li>
+          <li>Movie and games trivia</li>
+          <li>Ultimate frisbee</li>
+          <li>Night game</li>
+          <li>Hookah</li>
+          <li>Pizza party, BBQ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</Default>

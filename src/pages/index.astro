@@ -1,0 +1,291 @@
+---
+import Default from '../layouts/Default.astro';
+import ButtonLink from '../components/ButtonLink.astro';
+import TextScramble from '../components/TextScramble.astro';
+
+const phrases = [
+  'Shaken not Stirred.',
+  'Seven Sins, No Regrets.',
+  'Licensed to Code.',
+  'Lucky seven.',
+  'The Seventh Wonder.',
+];
+---
+
+<Default title="Event 7.0.0" activeId="home">
+  <div class="container" style="padding: 5rem 0">
+    <div class="row text-center">
+      <h1 class="mb-3 home-header">
+        garage::<span class="secondary-color">trip</span>::<span class="secondary-color"
+          >7.0.0</span
+        >
+      </h1>
+      <p>
+        <TextScramble phrases={phrases} />
+      </p>
+    </div>
+
+    <div class="home-actions">
+      <ButtonLink
+        url="/register"
+        text="join the event"
+        icon="event"
+        variant="purple"
+        size="big"
+        target="_self"
+      />
+      <ButtonLink
+        url="https://discord.com/invite/TnaMJMyTDw"
+        text="join our Discord"
+        icon="discord"
+        variant="blue"
+        size="big"
+      />
+    </div>
+  </div>
+
+  <div class="row gy-3 mb-4">
+    <div class="col-lg-4">
+      <div class="box info-box">
+        <div class="info-box-inner">
+          <h3>Save the date;</h3>
+          <p class="subtitle">12&nbsp;&ndash;&nbsp;19&nbsp;/&nbsp;9&nbsp;/&nbsp;2026</p>
+          <div class="info-box-inner-footer">
+            <ButtonLink
+              url="https://evt.to/7055f4tvpvlh"
+              text="add to calendar"
+              icon="google-calendar"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="box info-box">
+        <img
+          class="info-box-bg illu-location"
+          src="/assets/svg/illu-location.svg"
+          width="384"
+          height="224"
+        />
+        <div class="info-box-inner">
+          <h3>Location;</h3>
+          <p class="subtitle">
+            Chalupa Nový Svět<br />
+            Prostřední Lipka 74<br />
+            Králíky, Orlické hory
+          </p>
+          <div class="info-box-inner-footer">
+            <ButtonLink
+              url="https://maps.app.goo.gl/zRF3NoHsnYzASQaR9"
+              text="Google Maps"
+              icon="google-maps"
+            />
+            <ButtonLink url="https://mapy.cz/s/mejeturodo" text="Mapy.com" icon="mapy-cz" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="box info-box">
+        <img
+          class="info-box-bg illu-sauna"
+          src="/assets/svg/illu-sauna.svg"
+          width="256"
+          height="225"
+        />
+        <div class="info-box-inner">
+          <h3>Accommodation;</h3>
+          <p class="subtitle">Cottage "Novy Svet"</p>
+          <ul class="accommodation-features">
+            <li>32 beds | 14 rooms</li>
+            <li>14 000 m<sup>2</sup> garden with pond and outdoor playground</li>
+            <li>Ton of seating</li>
+            <li>Grill, 4 taps and a Sauna</li>
+            <li>Two-story children's corner</li>
+          </ul>
+          <div class="info-box-inner-footer">
+            <ButtonLink
+              url="https://www.novysvetlipka.cz/ubytovani-chalupa-novy-svet-prostredni-lipka-orlicke-hory.html"
+              text="more information"
+              icon="website"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col">
+      <div class="box">
+        <h3>Invitation</h3>
+        <ul>
+          <li>
+            <strong>Major version update</strong>: from <a href="/history" target="_blank">six</a>{' '}
+            to seven ... 6🤷7
+          </li>
+          <li>
+            <strong>Legacy Support</strong>: All your favorite friends and puzzles remain fully
+            compatible.
+          </li>
+          <li>
+            <strong>Multi-generational Mode</strong>: The kid-friendly plugin is still enabled.
+          </li>
+          <li>
+            <strong>Performance Tweak</strong>: Optimized for maximum nerdy joy and minimum sleep.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col">
+      <div class="box">
+        <h3>Feedback</h3>
+        <div class="row gy-3">
+          <div class="col-lg-4">
+            <div class="comment-box p-3"><em>Nerdvana.</em></div>
+          </div>
+          <div class="col-lg-4">
+            <div class="comment-box p-3"><em>The highlight of the year.</em></div>
+          </div>
+          <div class="col-lg-4">
+            <div class="comment-box p-3"><em>Never attended an event like this before.</em></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Images section — commented out, ready to enable for event 7.0.0
+  <div class="row mb-4">
+    <div class="col">
+      <div class="box images">
+        <h3>Images</h3>
+        <div class="row gy-3 mb-3">
+          <div class="col-lg-3">
+            <img src="/assets/images/400/walk.webp" class="img-thumbnail" alt="Outdoor walk" data-bs-toggle="modal" data-bs-target="#imageModal">
+          </div>
+          <div class="col-lg-3">
+            <img src="/assets/images/400/drinks.webp" class="img-thumbnail" alt="Drinks">
+          </div>
+          <div class="col-lg-3">
+            <img src="/assets/images/400/gaming.webp" class="img-thumbnail" alt="Gaming">
+          </div>
+          <div class="col-lg-3">
+            <img src="/assets/images/400/bbq.webp" class="img-thumbnail" alt="BBQ">
+          </div>
+        </div>
+        <div class="row gy-3">
+          <div class="col-lg-3">
+            <img src="/assets/images/400/intro.webp" class="img-thumbnail" alt="Intro talk">
+          </div>
+          <div class="col-lg-3">
+            <img src="/assets/images/400/board-game.webp" class="img-thumbnail" alt="Board Game">
+          </div>
+          <div class="col-lg-3">
+            <img src="/assets/images/400/hookah.webp" class="img-thumbnail" alt="Hookah">
+          </div>
+          <div class="col-lg-3">
+            <img src="/assets/images/400/az.webp" class="img-thumbnail" alt="AZ Quiz">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  -->
+
+  <!-- Schedule section — commented out, ready to enable for event 7.0.0
+  <div class="row mb-4">
+    <div class="col">
+      <div class="box" id="schedule">
+        <h3>Schedule</h3>
+        <div class="row gy-3">
+          <div class="col-md-3">
+            <div class="day">
+              <div class="date">20.9 Sat</div>
+              <div class="content"><ul><li>Arrival</li><li>Welcome BBQ</li></ul></div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="day">
+              <div class="date">21.9 Sun</div>
+              <div class="content"><ul><li>Microbots (HW coding)</li><li>Board Games</li></ul></div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="day">
+              <div class="date">22.9 Mon</div>
+              <div class="content"><ul><li>Outdoor Activity</li><li>LAN party</li></ul></div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="day">
+              <div class="date">23.9 Tue</div>
+              <div class="content"><ul><li>AI coding game</li></ul></div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="day">
+              <div class="date">24.9 Wed</div>
+              <div class="content"><ul><li>AI coding game</li></ul></div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="day">
+              <div class="date">25.9 Thu</div>
+              <div class="content"><ul><li>Barcamp</li></ul></div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="day">
+              <div class="date">26.9 Fri</div>
+              <div class="content"><ul><li>Outdoor activity</li><li>Farewell party</li></ul></div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="day">
+              <div class="date">27.9 Sat</div>
+              <div class="content"><ul><li>Leaving</li></ul></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  -->
+
+  <div class="row mb-4 text-center socials">
+    <a href="https://mastodon.social/@garagetrip"><i class="bi bi-mastodon"></i></a>
+  </div>
+
+  <div
+    class="modal fade"
+    id="imageModal"
+    tabindex="-1"
+    aria-labelledby="imageModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          <img src="" id="modalImage" class="img-fluid" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline>
+    // Image modal swap (for gallery section when enabled)
+    document.addEventListener('DOMContentLoaded', function () {
+      var modalImage = document.getElementById('modalImage');
+      document.querySelectorAll('.images img').forEach(function (image) {
+        image.addEventListener('click', function () {
+          modalImage.src = image.src.replace('/400/', '/2000/');
+        });
+      });
+    });
+  </script>
+</Default>

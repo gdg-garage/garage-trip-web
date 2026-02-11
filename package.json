@@ -1,24 +1,22 @@
 {
+  "name": "garage-trip-web",
   "type": "module",
-  "dependencies": {
-    "bootstrap": "^5.3.3",
-    "flat-map": "^1.0.0",
-    "gulp": "^5.0.0",
-    "mhtml2html": "^3.0.0",
-    "punycode": "^2.3.1",
-    "punycode.js": "^2.3.1"
-  },
+  "version": "7.0.0",
   "scripts": {
-    "gulp": "gulp",
-    "serve": "jekyll serve"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
-  "devDependencies": {
-    "gulp-clone": "^2.0.1",
-    "gulp-image-resize": "^0.13.1",
-    "gulp-imagemin": "^9.1.0",
-    "gulp-rename": "^2.0.0",
-    "gulp-scale-images": "^3.0.3",
-    "gulp-webp": "^5.0.0"
+  "dependencies": {
+    "@astrojs/react": "^4.2.0",
+    "@astrojs/sitemap": "^3.3.0",
+    "@types/react": "^19.2.14",
+    "astro": "^5.3.0",
+    "bootstrap": "^5.3.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sass": "^1.83.0"
   },
   "engines": {
     "node": ">=20.0.0 <=24.0.0"

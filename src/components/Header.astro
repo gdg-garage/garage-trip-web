@@ -1,0 +1,41 @@
+---
+import ButtonLink from './ButtonLink.astro';
+
+interface Props {
+  activeId?: string;
+}
+
+const { activeId } = Astro.props;
+---
+
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark header">
+  <div class="container-fluid header-container">
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="logo header-item" href="/" title="Garage Trip">
+      garage::<span class="secondary-color">trip</span>
+    </a>
+    <div class="menu">
+      <div class="menu-container-desktop">
+        <a class:list={['menu-link', { active: activeId === 'home' }]} href="/">/home</a>
+        <a class:list={['menu-link', { active: activeId === 'history' }]} href="/history">/changelog</a>
+      </div>
+    </div>
+    <div class="header-item">
+      <ButtonLink url="/register" text="join the event" variant="purple" size="small" target="_self" />
+    </div>
+  </div>
+  <div class="collapse menu-container-phone" id="navbarNavAltMarkup">
+    <a class:list={['menu-link', { active: activeId === 'home' }]} href="/">/home</a>
+    <a class:list={['menu-link', { active: activeId === 'history' }]} href="/history">/history</a>
+  </div>
+</nav>
