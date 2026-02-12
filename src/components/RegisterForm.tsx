@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import clsx from 'clsx';
 
 const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://api.garage-trip.cz';
 const EVENT_ID = 'g::t::7.0.0';
@@ -188,18 +189,18 @@ export default function RegisterForm() {
   }
 
   // authorized
-  const joiningStatusText =
-    joiningStatus === 'yes'
-      ? 'registered;'
-      : joiningStatus === 'no'
-        ? 'NOT registered;'
-        : 'awaiting response;';
-  const joiningStatusClass =
-    joiningStatus === 'yes'
-      ? 'monospace text-success ms-2'
-      : joiningStatus === 'no'
-        ? 'monospace text-danger ms-2'
-        : 'monospace secondary-color ms-2';
+  const joiningStatusTextMap: Record<JoiningStatus, string> = {
+    yes: 'registered;',
+    no: 'NOT registered;',
+    awaiting: 'awaiting response;',
+  };
+  const joiningStatusText = joiningStatusTextMap[joiningStatus];
+  
+  const joiningStatusClass = clsx('monospace ms-2', {
+    'text-success': joiningStatus === 'yes',
+    'text-danger': joiningStatus === 'no',
+    'secondary-color': joiningStatus === 'awaiting',
+  });
 
   return (
     <div className="row mt-4">
@@ -223,9 +224,10 @@ export default function RegisterForm() {
                   <div>
                     <span className="text-secondary">Payment:</span>
                     <span
-                      className={
-                        paid ? 'monospace text-success ms-2' : 'monospace text-warning ms-2'
-                      }
+                      className={clsx('monospace ms-2', {
+                        'text-success': paid,
+                        'text-warning': !paid,
+                      })}
                     >
                       {paid ? 'paid;' : 'payment pending;'}
                     </span>
@@ -357,7 +359,7 @@ export default function RegisterForm() {
             </div>
           </form>
           {formMessage && (
-            <div className={`mt-3 text-center ${formMessage.type}`}>{formMessage.text}</div>
+            <div className={clsx('mt-3 text-center', formMessage.type)}>{formMessage.text}</div>
           )}
         </div>
       </div>
