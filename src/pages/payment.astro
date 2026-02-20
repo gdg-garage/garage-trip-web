@@ -14,18 +14,105 @@ import Default from '../layouts/Default.astro';
 
         <div class="payment-details mt-4 p-4 border border-secondary rounded bg-dark">
           <h4 class="secondary-color mb-3">Registration Fee: 3000 CZK</h4>
-          <p>Please send the payment to the following account:</p>
-          <ul class="list-unstyled">
-            <li><strong>Account Number:</strong> [TODO: Insert Account Number]</li>
-            <li><strong>Variable Symbol:</strong> [TODO: Insert Variable Symbol or instruction]</li>
-            <li><strong>Message for recipient:</strong> garage trip 7 - [Your Name]</li>
-          </ul>
+          <p class="mb-2 text-secondary">Please send the payment to the following account:</p>
+          <div class="table-responsive">
+            <table class="table table-borderless align-middle mb-0">
+              <tbody>
+                <tr>
+                  <td class="text-secondary small py-1" style="width: 160px; min-width: 160px;"><strong>Account Number:</strong></td>
+                  <td class="fs-2 fw-bold monospace text-white py-1">7289978676/5500</td>
+                </tr>
+                <tr>
+                  <td class="text-secondary small py-1"><strong>Note for recipient:</strong></td>
+                  <td class="fs-5 fw-bold monospace text-white py-1">[Your email address]</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-4 mb-0" style="font-size: 0.75rem; color: #6c757d; font-style: italic;">
+            * If you do not have CZK, please contact us.
+          </p>
         </div>
 
         <div class="mt-4">
-          <p>
-            Once we receive your payment, your status will be updated to "paid" in the registration
-            system. This might take a few days to process.
+          <div class="alert alert-info bg-dark border-info text-info-emphasis p-4">
+            <h5 class="alert-heading fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>Manual Processing</h5>
+            <p class="mb-0 text-info">
+              Please note that all payments are <strong>processed manually</strong> by our team. 
+              As such, please <strong>expect delays</strong> of several days before your payment is reflected in the system. 
+              Human errors can occur; if your payment isn't confirmed within a week, please reach out to us.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <h4 class="mb-3">All-inclusive;</h4>
+          <p class="text-secondary small mb-3">
+            The event is <strong>completely all-inclusive</strong>. We have decided not to track individual consumption for financial purposes during the event. 
+          </p>
+          <p class="text-secondary small mb-3">
+            In the past, tracking and backtracking consumption was quite complicated, and we found that the final price difference for individuals wasn't significant enough to justify the extra effort. Our primary goal is for everyone to <strong>simply enjoy the event</strong> however they see fit.
+          </p>
+          <p class="text-secondary small mb-3">
+            We believe this approach is fair: while one person might enjoy more drinks, another might prefer spending extra time in the sauna or enjoying other amenities. While we considered separating the price of alcohol for abstainers, we strongly prefer to maintain a single, inclusive model for the whole group.
+          </p>
+          <p class="text-secondary small">
+            The total cost—comprising accommodation, food, activities, and all consumption—is summed up and then split among all participants using the formula described below.
+          </p>
+        </div>
+
+        <div class="mt-5">
+          <h4 class="mb-3">Price Calculation;</h4>
+          <p class="text-secondary small mb-3">
+            Our pricing is designed to be fair and transparent, distributing the total event costs 
+            among all participants. We use an exponential model (exponent 0.6) to calculate individual 
+            fees based on the duration of your stay:
+          </p>
+          <div class="p-3 bg-dark border border-secondary rounded monospace mb-3 text-center">
+            <span class="fs-4 text-white">Price = (Nights<sup>0.6</sup>) &times; Unit_Coefficient</span>
+          </div>
+          <p class="text-secondary small">
+            This "Fair Split" model ensures that while those staying longer contribute more, 
+             the <strong>effective price per night decreases</strong> the longer you stay. 
+            This makes it more affordable for everyone to join for the full duration of the event.
+          </p>
+        </div>
+
+        <div class="mt-5">
+          <h4 class="mb-3">Cancellation Policy;</h4>
+          <p class="text-secondary small mb-3">
+            If you need to cancel your registration, the following cancellation fees (calculated from the registration fee) apply based on when you notify us:
+          </p>
+          <div class="table-responsive">
+            <table class="table custom-table">
+              <thead>
+                <tr>
+                  <th>Time before event;</th>
+                  <th>Cancellation fee;</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>&ge; 3 months</td>
+                  <td class="text-success">0%</td>
+                </tr>
+                <tr>
+                  <td>&ge; 1 month</td>
+                  <td class="text-warning">25%</td>
+                </tr>
+                <tr>
+                  <td>&ge; 2 weeks</td>
+                  <td class="text-warning">50%</td>
+                </tr>
+                <tr>
+                  <td>&lt; 2 weeks</td>
+                  <td class="text-danger">100%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-3 text-secondary small italic">
+            * The cancellation fee does not apply if you find a substitute to attend in your place.
           </p>
         </div>
 

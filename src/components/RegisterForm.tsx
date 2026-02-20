@@ -1,10 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
-import type { RegistrationInfo, JoiningStatus } from './regisration.types';
+import type { RegistrationInfo, JoiningStatus, RegistrationHistoryItem } from './regisration.types';
 import EventRegistrationForm from './EventRegistrationForm';
 
 const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://api.garage-trip.cz';
 const EVENT_ID = 'g::t::7.0.0';
+const DEFAULT_ARRIVAL_DATE = '2026-09-12';
+const DEFAULT_DEPARTURE_DATE = '2026-09-19';
+const DEFAULT_ARRIVAL_HOUR = '17';
+const DEFAULT_DEPARTURE_HOUR = '10';
 
 interface Registration {
   event: string;
@@ -30,14 +34,17 @@ export default function RegisterForm() {
 
   const [regisrationInfo, setRegistrationInfo] = useState<RegistrationInfo>({
     joiningStatus: 'awaiting',
-    arrivalDate: '',
-    departureDate: '',
+    arrivalDate: DEFAULT_ARRIVAL_DATE,
+    arrivalHour: DEFAULT_ARRIVAL_HOUR,
+    departureDate: DEFAULT_DEPARTURE_DATE,
+    departureHour: DEFAULT_DEPARTURE_HOUR,
     childrenCount: 0,
     foodRestrictions: '',
     note: '',
   });
   const [formMessage, setFormMessage] = useState<{ text: string; type: string } | null>(null);
   const [errorHtml, setErrorHtml] = useState('');
+  const [history, setHistory] = useState<RegistrationHistoryItem[]>([]);
 
   const checkAuth = useCallback(async () => {
     try {
@@ -57,8 +64,12 @@ export default function RegisterForm() {
           if (reg) {
             setRegistrationInfo({
               joiningStatus: reg.cancelled ? 'no' : 'yes',
-              arrivalDate: reg.arrival_date ? reg.arrival_date.split('T')[0] : '',
-              departureDate: reg.departure_date ? reg.departure_date.split('T')[0] : '',
+              // If they were already registered, use their dates. 
+              // If they were NOT registered (cancelled), show defaults instead of whatever archival dates might be in DB.
+              arrivalDate: (!reg.cancelled && reg.arrival_date) ? reg.arrival_date.split('T')[0] : DEFAULT_ARRIVAL_DATE,
+              arrivalHour: (!reg.cancelled && reg.arrival_date) ? new Date(reg.arrival_date).getHours().toString() : DEFAULT_ARRIVAL_HOUR,
+              departureDate: (!reg.cancelled && reg.departure_date) ? reg.departure_date.split('T')[0] : DEFAULT_DEPARTURE_DATE,
+              departureHour: (!reg.cancelled && reg.departure_date) ? new Date(reg.departure_date).getHours().toString() : DEFAULT_DEPARTURE_HOUR,
               childrenCount: reg.children_count || 0,
               foodRestrictions: reg.food_restrictions || '',
               note: reg.note || '',
@@ -78,6 +89,27 @@ export default function RegisterForm() {
     }
   }, []);
 
+  const fetchHistory = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/history?event=${EVENT_ID}&diff=false`, {
+        headers: { Accept: 'application/json' },
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setHistory(data.history || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch history:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (authState === 'authorized') {
+      fetchHistory();
+    }
+  }, [authState, fetchHistory]);
+
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
@@ -88,7 +120,9 @@ export default function RegisterForm() {
     const {
       joiningStatus,
       arrivalDate,
+      arrivalHour,
       departureDate,
+      departureHour,
       childrenCount,
       foodRestrictions,
       note,
@@ -96,9 +130,17 @@ export default function RegisterForm() {
 
     const isJoining = joiningStatus === 'yes';
 
+    const parseDateTime = (dateStr: string, hourStr: string, defaultDate: string, defaultHour: string) => {
+      const datePart = dateStr || defaultDate;
+      const hourPart = hourStr || defaultHour;
+      const date = new Date(datePart);
+      date.setHours(parseInt(hourPart, 10), 0, 0, 0);
+      return date.toISOString();
+    };
+
     const payload = {
-      arrival_date: isJoining ? new Date(arrivalDate).toISOString() : new Date().toISOString(),
-      departure_date: isJoining ? new Date(departureDate).toISOString() : new Date().toISOString(),
+      arrival_date: parseDateTime(arrivalDate, arrivalHour, DEFAULT_ARRIVAL_DATE, DEFAULT_ARRIVAL_HOUR),
+      departure_date: parseDateTime(departureDate, departureHour, DEFAULT_DEPARTURE_DATE, DEFAULT_DEPARTURE_HOUR),
       children_count: isJoining ? childrenCount : 0,
       food_restrictions: isJoining ? foodRestrictions : '',
       cancelled: !isJoining,
@@ -120,7 +162,7 @@ export default function RegisterForm() {
         setRegistrationInfo(data);
 
         if (isJoining) {
-          const meResponse = await fetch(`${API_BASE_URL}/me?event=${EVENT_ID}`, {
+          const meResponse = await fetch(`${API_BASE_URL}/user?event=${EVENT_ID}`, {
             credentials: 'include',
           });
           if (meResponse.ok) {
@@ -128,6 +170,8 @@ export default function RegisterForm() {
             setPaid(meData.paid);
           }
         }
+        // Refresh history
+        fetchHistory();
       } else {
         const errData = await response.json();
         setFormMessage({
@@ -262,6 +306,90 @@ export default function RegisterForm() {
           />
           {formMessage && (
             <div className={clsx('mt-3 text-center', formMessage.type)}>{formMessage.text}</div>
+          )}
+
+          {history.length > 0 && (
+            <div className="mt-5 pt-4 border-top border-secondary">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h4 className="mb-0">Registration History;</h4>
+                <div className="text-secondary small">/log</div>
+              </div>
+              <div className="history-list small">
+                {history.map((item, index) => {
+                  const prevItem = history[index + 1];
+                  const changes = [];
+
+                  if (!prevItem) {
+                    changes.push({ label: 'Status', value: item.fields.cancelled ? 'cancelled' : 'initial registration' });
+                    if (!item.fields.cancelled) {
+                      changes.push({ label: 'Arrival', value: new Date(item.fields.arrival_date!).toLocaleString('cs-CZ', { dateStyle: 'short', timeStyle: 'short' }) });
+                      changes.push({ label: 'Departure', value: new Date(item.fields.departure_date!).toLocaleString('cs-CZ', { dateStyle: 'short', timeStyle: 'short' }) });
+                      if (item.fields.children_count) changes.push({ label: 'Children', value: item.fields.children_count });
+                      if (item.fields.food_restrictions) changes.push({ label: 'Food', value: item.fields.food_restrictions });
+                    }
+                  } else {
+                    if (item.fields.cancelled !== prevItem.fields.cancelled) {
+                      changes.push({
+                        label: 'Status',
+                        old: prevItem.fields.cancelled ? 'cancelled' : 'active',
+                        new: item.fields.cancelled ? 'cancelled' : 'active'
+                      });
+                    }
+                    if (!item.fields.cancelled) {
+                      if (item.fields.arrival_date !== prevItem.fields.arrival_date) {
+                        changes.push({
+                          label: 'Arrival',
+                          old: new Date(prevItem.fields.arrival_date!).toLocaleString('cs-CZ', { dateStyle: 'short', timeStyle: 'short' }),
+                          new: new Date(item.fields.arrival_date!).toLocaleString('cs-CZ', { dateStyle: 'short', timeStyle: 'short' })
+                        });
+                      }
+                      if (item.fields.departure_date !== prevItem.fields.departure_date) {
+                        changes.push({
+                          label: 'Departure',
+                          old: new Date(prevItem.fields.departure_date!).toLocaleString('cs-CZ', { dateStyle: 'short', timeStyle: 'short' }),
+                          new: new Date(item.fields.departure_date!).toLocaleString('cs-CZ', { dateStyle: 'short', timeStyle: 'short' })
+                        });
+                      }
+                      if (item.fields.children_count !== prevItem.fields.children_count) {
+                        changes.push({ label: 'Children', old: prevItem.fields.children_count, new: item.fields.children_count });
+                      }
+                      if (item.fields.food_restrictions !== prevItem.fields.food_restrictions) {
+                        changes.push({ label: 'Food', old: prevItem.fields.food_restrictions || 'none', new: item.fields.food_restrictions || 'none' });
+                      }
+                    }
+                    if (item.fields.note !== prevItem.fields.note) {
+                      changes.push({ label: 'Note', old: prevItem.fields.note || 'none', new: item.fields.note || 'none' });
+                    }
+                  }
+
+                  if (changes.length === 0) return null;
+
+                  return (
+                    <div key={item.id} className="history-item mb-3 p-3 bg-dark rounded border border-secondary">
+                      <div className="d-flex justify-content-between text-secondary mb-2 border-bottom border-secondary pb-1">
+                        <span className="monospace">{new Date(item.created_at).toLocaleString('cs-CZ')}</span>
+                      </div>
+                      <div className="monospace">
+                        {changes.map((change, cIdx) => (
+                          <div key={cIdx} className="mb-1">
+                            <span className="text-secondary">{change.label}:</span>{' '}
+                            {change.old !== undefined ? (
+                              <>
+                                <span className="text-danger text-decoration-line-through me-1">{change.old}</span>
+                                <i className="bi bi-arrow-right mx-1 text-secondary"></i>
+                                <span className="text-success">{change.new}</span>
+                              </>
+                            ) : (
+                              <span className="text-light">{change.value}</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
       </div>

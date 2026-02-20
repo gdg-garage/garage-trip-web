@@ -1,0 +1,86 @@
+---
+import Default from './Default.astro';
+import OrgMenu from '../components/org/OrgMenu.astro';
+
+interface Props {
+  title: string;
+  activeTab: 'registrations' | 'achievements';
+}
+
+const { title, activeTab } = Astro.props;
+---
+
+<Default title={title} activeId="org">
+  <div class="row mt-4 mt-lg-5">
+    <div class="col-12">
+      <div class="box p-4 mb-4">
+        <h1 class="mb-4">Organization Dashboard;</h1>
+        <OrgMenu activeTab={activeTab} />
+        <div class="org-content mt-4">
+          <slot />
+        </div>
+      </div>
+    </div>
+  </div>
+</Default>
+
+<style is:global>
+  .custom-table {
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    background: transparent !important;
+  }
+
+  .custom-table thead th {
+    border: none;
+    color: #b9bbbe;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    background: transparent !important;
+  }
+
+  .custom-table tbody tr {
+    background-color: #2b2d31 !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 8px;
+  }
+
+  .custom-table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    background-color: #313338 !important;
+  }
+
+  .custom-table tbody td {
+    padding: 1.25rem 1rem;
+    border: none;
+    color: #dcddde;
+    vertical-align: middle;
+  }
+
+  .custom-table tbody td:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    font-weight: 600;
+    color: #5865f2;
+  }
+
+  .custom-table tbody td:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+
+  .badge {
+    padding: 0.5em 0.8em;
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+  }
+
+  .opacity-50 {
+    opacity: 0.5;
+  }
+</style>

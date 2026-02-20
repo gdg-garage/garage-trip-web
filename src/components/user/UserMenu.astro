@@ -1,0 +1,58 @@
+---
+interface Props {
+  activeTab: 'profile' | 'api-keys';
+}
+
+const { activeTab } = Astro.props;
+---
+
+<div class="user-menu mb-4">
+  <div class="d-flex gap-3">
+    <a 
+      href="/user" 
+      class:list={['user-menu-item', { active: activeTab === 'profile' }]}
+    >
+      <i class="bi bi-person-fill me-2"></i>Profile
+    </a>
+    <a 
+      href="/user/api-keys" 
+      class:list={['user-menu-item', { active: activeTab === 'api-keys' }]}
+    >
+      <i class="bi bi-key-fill me-2"></i>API Keys
+    </a>
+  </div>
+</div>
+
+<style>
+  .user-menu {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+  }
+
+  .user-menu-item {
+    color: #b9bbbe;
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+  }
+
+  .user-menu-item:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .user-menu-item.active {
+    color: #5865f2;
+    background-color: rgba(88, 101, 242, 0.1);
+  }
+
+  .user-menu-item i {
+    font-size: 1.1rem;
+  }
+</style>

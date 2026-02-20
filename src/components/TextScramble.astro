@@ -74,14 +74,28 @@ const { phrases, elementId = 'subtitle-rotation' } = Astro.props;
   const el = document.getElementById(elementId);
   const fx = new TextScramble(el);
 
+  let phraseQueue = [];
+
+  const shuffle = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
   const next = () => {
-    let nextIndex = Math.floor(Math.random() * phrases.length);
-    if (phrases.length > 1) {
-      while (phrases[nextIndex] === el.innerText) {
-        nextIndex = Math.floor(Math.random() * phrases.length);
+    if (phraseQueue.length === 0) {
+      phraseQueue = shuffle([...phrases]);
+      // If the first item to be popped is the same as current, swap it with another if possible
+      if (phraseQueue.length > 1 && phraseQueue[phraseQueue.length - 1] === el.innerText) {
+        // Swap with the first element (index 0)
+        [phraseQueue[0], phraseQueue[phraseQueue.length - 1]] = [phraseQueue[phraseQueue.length - 1], phraseQueue[0]];
       }
     }
-    fx.setText(phrases[nextIndex]).then(() => {
+
+    const phrase = phraseQueue.pop();
+    fx.setText(phrase).then(() => {
       setTimeout(next, 3000);
     });
   };

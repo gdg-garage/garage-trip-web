@@ -176,6 +176,9 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
 
     border-radius: $radius;
+    border: none;
+    cursor: pointer;
+    justify-content: center;
     color: white;
     font-size: 0.875rem;
     line-height: 1.5rem;
