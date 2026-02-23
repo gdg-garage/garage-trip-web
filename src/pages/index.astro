@@ -2,6 +2,15 @@
 import Default from '../layouts/Default.astro';
 import ButtonLink from '../components/ButtonLink.astro';
 import TextScramble from '../components/TextScramble.astro';
+import { Image } from 'astro:assets';
+
+const mainImages = Object.values(import.meta.glob('/src/assets/images/g::t::7.0.0/*.{jpg,png}', { eager: true }));
+const allImages = mainImages.map((mod: any) => mod.default);
+allImages.sort((a, b) => {
+  const matchA = a.src.match(/hp_(\d+)/);
+  const matchB = b.src.match(/hp_(\d+)/);
+  return (matchA ? parseInt(matchA[1]) : 0) - (matchB ? parseInt(matchB[1]) : 0);
+});
 
 const phrases = [
   'Licensed to Code.',
@@ -164,43 +173,34 @@ const phrases = [
     </div>
   </div>
 
-  <!-- Images section — commented out, ready to enable for event 7.0.0
   <div class="row mb-4">
     <div class="col">
-      <div class="box images">
+      <div class="box images position-relative">
         <h3>Images</h3>
-        <div class="row gy-3 mb-3">
-          <div class="col-lg-3">
-            <img src="/assets/images/400/walk.webp" class="img-thumbnail" alt="Outdoor walk" data-bs-toggle="modal" data-bs-target="#imageModal">
-          </div>
-          <div class="col-lg-3">
-            <img src="/assets/images/400/drinks.webp" class="img-thumbnail" alt="Drinks">
-          </div>
-          <div class="col-lg-3">
-            <img src="/assets/images/400/gaming.webp" class="img-thumbnail" alt="Gaming">
-          </div>
-          <div class="col-lg-3">
-            <img src="/assets/images/400/bbq.webp" class="img-thumbnail" alt="BBQ">
-          </div>
-        </div>
-        <div class="row gy-3">
-          <div class="col-lg-3">
-            <img src="/assets/images/400/intro.webp" class="img-thumbnail" alt="Intro talk">
-          </div>
-          <div class="col-lg-3">
-            <img src="/assets/images/400/board-game.webp" class="img-thumbnail" alt="Board Game">
-          </div>
-          <div class="col-lg-3">
-            <img src="/assets/images/400/hookah.webp" class="img-thumbnail" alt="Hookah">
-          </div>
-          <div class="col-lg-3">
-            <img src="/assets/images/400/az.webp" class="img-thumbnail" alt="AZ Quiz">
+        
+        <div class="carousel-wrapper" style="position: relative;">
+          <button id="scrollLeftBtn" class="btn btn-primary" style="position: absolute; left: -15px; top: 50%; transform: translateY(-50%); z-index: 10; border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          
+          <button id="scrollRightBtn" class="btn btn-primary" style="position: absolute; right: -15px; top: 50%; transform: translateY(-50%); z-index: 10; border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+          
+          <div id="imageTrack" style="display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 15px; padding: 10px 0; scrollbar-width: none; -ms-overflow-style: none;">
+            <style>
+              #imageTrack::-webkit-scrollbar { display: none; }
+            </style>
+            {allImages.map((img) => (
+              <div style="flex: 0 0 auto; width: 300px;">
+                <Image src={img} width={400} alt="Event Image" class="img-thumbnail" style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" data-full={img.src} />
+              </div>
+            ))}
           </div>
         </div>
       </div>
     </div>
   </div>
-  -->
 
   <div class="row mb-4">
     <div class="col">
@@ -291,13 +291,43 @@ const phrases = [
   </div>
 
   <script is:inline>
-    // Image modal swap (for gallery section when enabled)
     document.addEventListener('DOMContentLoaded', function () {
+      // Modal swap logic
       var modalImage = document.getElementById('modalImage');
-      document.querySelectorAll('.images img').forEach(function (image) {
+      var imageElements = Array.from(document.querySelectorAll('#imageTrack img'));
+      var currentImageIndex = -1;
+
+      imageElements.forEach(function (image, index) {
         image.addEventListener('click', function () {
-          modalImage.src = image.src.replace('/400/', '/2000/');
+          currentImageIndex = index;
+          modalImage.src = image.getAttribute('data-full') || image.src;
         });
+      });
+      
+      // Modal keyboard navigation logic
+      document.addEventListener('keydown', function(event) {
+        // Find if modal is open (using Bootstrap 'show' class convention)
+        var modal = document.getElementById('imageModal');
+        if (modal && modal.classList.contains('show') && currentImageIndex !== -1) {
+          if (event.key === 'ArrowLeft') {
+            currentImageIndex = (currentImageIndex - 1 + imageElements.length) % imageElements.length;
+            var newImage = imageElements[currentImageIndex];
+            modalImage.src = newImage.getAttribute('data-full') || newImage.src;
+          } else if (event.key === 'ArrowRight') {
+            currentImageIndex = (currentImageIndex + 1) % imageElements.length;
+            var newImage = imageElements[currentImageIndex];
+            modalImage.src = newImage.getAttribute('data-full') || newImage.src;
+          }
+        }
+      });
+      
+      // Carousel navigation logic
+      var track = document.getElementById('imageTrack');
+      document.getElementById('scrollLeftBtn').addEventListener('click', function() {
+        track.scrollBy({ left: -315, behavior: 'smooth' });
+      });
+      document.getElementById('scrollRightBtn').addEventListener('click', function() {
+        track.scrollBy({ left: 315, behavior: 'smooth' });
       });
     });
   </script>
