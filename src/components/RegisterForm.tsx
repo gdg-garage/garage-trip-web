@@ -64,7 +64,7 @@ export default function RegisterForm() {
           if (reg) {
             setRegistrationInfo({
               joiningStatus: reg.cancelled ? 'no' : 'yes',
-              // If they were already registered, use their dates. 
+              // If they were already registered, use their dates.
               // If they were NOT registered (cancelled), show defaults instead of whatever archival dates might be in DB.
               arrivalDate: (!reg.cancelled && reg.arrival_date) ? reg.arrival_date.split('T')[0] : DEFAULT_ARRIVAL_DATE,
               arrivalHour: (!reg.cancelled && reg.arrival_date) ? new Date(reg.arrival_date).getHours().toString() : DEFAULT_ARRIVAL_HOUR,
@@ -234,7 +234,7 @@ export default function RegisterForm() {
               to register for the event.
             </p>
             <div className="d-flex justify-content-center mt-3">
-              <a href={`${API_BASE_URL}/auth/discord/login`} className="button blue big">
+              <a href={`${API_BASE_URL}/auth/discord/login`} className="button blue big" target='_blank'>
                 <i className="bi bi-discord"></i> Login via Discord
               </a>
             </div>
@@ -303,6 +303,7 @@ export default function RegisterForm() {
           <EventRegistrationForm
             initialRegistrationInfo={regisrationInfo}
             onSubmit={handleSubmit}
+            isNotRegisteredYet={history.length === 0}
           />
           {formMessage && (
             <div className={clsx('mt-3 text-center', formMessage.type)}>{formMessage.text}</div>

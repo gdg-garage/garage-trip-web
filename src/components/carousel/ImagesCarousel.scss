@@ -1,0 +1,44 @@
+.imageTrack {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 15px;
+  padding: 10px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.imageTrack__imageContainer {
+  flex: 0 0 auto;
+  width: 300px;
+  height: 200px;
+  overflow: hidden;
+
+  background-color: var(--blue-bg);
+  border-radius: var(--bs-border-radius);
+}
+
+.imageTrack__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+  background-color: var(--blue-bg);
+
+  transition: transform 0.25s ease;
+
+  &:hover {
+    transform: scale(1.1);
+
+  }
+}
+
+
+.imageTrack__arrow {
+  transition: opacity 0.3s ease;
+}
+
+.imageTrack__arrow[disabled] {
+  opacity: 0.5;
+  pointer-events: none;
+}

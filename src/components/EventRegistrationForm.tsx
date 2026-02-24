@@ -5,11 +5,13 @@ import type { JoiningStatus, RegistrationInfo } from './regisration.types';
 
 interface EventRegistrationFormProps {
   initialRegistrationInfo: RegistrationInfo;
+  isNotRegisteredYet: boolean;
   onSubmit: (data: RegistrationInfo) => void;
 }
 
 export default function EventRegistrationForm({
   initialRegistrationInfo,
+  isNotRegisteredYet,
   onSubmit,
 }: EventRegistrationFormProps) {
   const [joiningStatus, setJoiningStatus] = useState<JoiningStatus>(initialRegistrationInfo.joiningStatus);
@@ -207,7 +209,7 @@ export default function EventRegistrationForm({
             <span className="button-icon">
               <img width="24" height="24" src="/assets/svg/icon/icon-event.svg" alt="" />
             </span>
-            submit registration
+            {isNotRegisteredYet ? 'Submit registration' : 'Update registration'}
           </button>
         </div>
       </div>

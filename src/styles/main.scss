@@ -1,9 +1,16 @@
+@import "colors.scss";
+
+$primary: $c-purple;
+$secondary: $c-blue;
+
 @import "bootstrap/scss/bootstrap";
 // local
 @import "variables.scss";
 @import "menu.scss";
 @import "header.scss";
 @import "home-header.scss";
+
+
 
 
 body {
@@ -30,7 +37,7 @@ h1, h2, h3, h4, h5, h6 {
     background-color: $blue-dark;
     border-radius: $radius;
     padding: 1.5rem 1rem 1rem;
-    
+
     table {
         width: 100%;
         margin: 0.8em 0;
@@ -45,7 +52,7 @@ h1, h2, h3, h4, h5, h6 {
         font-size: 1.5rem;
         line-height: 2rem;
         margin-bottom: 2.125rem;
-        
+
         font-weight: bold;
 
         &::after {
@@ -63,7 +70,7 @@ h1, h2, h3, h4, h5, h6 {
         line-height: 1.5rem;
 
         font-weight: bold;
-        
+
         color: $blue-light;
     }
     p.subtitle {
@@ -121,7 +128,7 @@ h1, h2, h3, h4, h5, h6 {
             bottom: 0;
             flex-wrap: wrap;
         }
-        
+
     }
 
     &-bg {
@@ -196,7 +203,7 @@ h1, h2, h3, h4, h5, h6 {
         padding: 0.75rem 1.25rem;
     }
 
-    
+
 
     @media #{$breakpoint-desktop} {
         font-size: 1rem;
@@ -283,7 +290,7 @@ a {
     height: 100%;
     z-index: -1;
     filter: blur(4px);
-    
+
     &-inner {
         width: 100%;
         height: 100%;
@@ -319,12 +326,12 @@ a {
         ul {
             padding: 0.5rem 0.75rem;
             margin: 0;
-            
+
 
             li {
                 list-style-type: none;
             }
-        } 
+        }
     }
 }
 
