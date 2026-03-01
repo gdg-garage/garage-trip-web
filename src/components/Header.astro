@@ -1,5 +1,6 @@
 ---
 import ButtonLink from './ButtonLink.astro';
+import UserHeaderLink from './UserHeaderLink.tsx';
 
 interface Props {
   activeId?: string;
@@ -28,6 +29,7 @@ const { activeId } = Astro.props;
       <div class="menu-container-desktop">
         <a class:list={['menu-link', { active: activeId === 'home' }]} href="/">/home</a>
         <a class:list={['menu-link', { active: activeId === 'history' }]} href="/history">/changelog</a>
+        <UserHeaderLink client:load activeId={activeId} />
       </div>
     </div>
     <div class="header-item">
@@ -37,5 +39,6 @@ const { activeId } = Astro.props;
   <div class="collapse menu-container-phone" id="navbarNavAltMarkup">
     <a class:list={['menu-link', { active: activeId === 'home' }]} href="/">/home</a>
     <a class:list={['menu-link', { active: activeId === 'history' }]} href="/history">/history</a>
+    <UserHeaderLink client:load activeId={activeId} />
   </div>
 </nav>

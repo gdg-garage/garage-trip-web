@@ -96,7 +96,7 @@ export default function EventRegistrationForm({
 
         {joiningStatus === 'yes' && (
           <div className="col-12">
-            <div className="alert alert-info border-info bg-dark-subtle mb-0">
+            <div className="alert alert-secondary border-secondary bg-dark-subtle mb-0">
               <i className="bi bi-info-circle-fill me-2"></i>
               <strong>Note:</strong> There are no +1s in the form. All adults should register using their own Discord account.
             </div>
@@ -174,6 +174,10 @@ export default function EventRegistrationForm({
                 onChange={(e) => setChildrenCount(parseInt(e.target.value, 10))}
                 required
               />
+              <div className="form-text text-warning mt-2">
+                <i className="bi bi-exclamation-triangle-fill me-1"></i>
+                If you're coming as a couple, please have only one parent include the children in their registration to avoid double-counting.
+              </div>
             </div>
             <div className="col-12">
               <label htmlFor="food_restrictions" className="form-label">
@@ -199,9 +203,13 @@ export default function EventRegistrationForm({
             className="form-control bg-dark text-white border-secondary"
             id="note"
             rows={3}
+            placeholder={"e.g. Partner's name: …\nChildren's ages: …"}
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
+          <div className="form-text text-secondary mt-1">
+            Please mention your partner's name and your children's ages if applicable.
+          </div>
         </div>
 
         <div className="col-12 text-center mt-4">

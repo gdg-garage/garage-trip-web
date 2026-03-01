@@ -54,22 +54,35 @@ allImages.sort((a, b) => {
         });
       });
 
+      function navigateImage(direction) {
+        if (currentImageIndex === -1) return;
+        if (direction === 'prev') {
+          currentImageIndex = (currentImageIndex - 1 + imageElements.length) % imageElements.length;
+        } else {
+          currentImageIndex = (currentImageIndex + 1) % imageElements.length;
+        }
+        var newImage = imageElements[currentImageIndex];
+        modalImage.src = newImage.getAttribute('data-full') || newImage.src;
+      }
+
       // Modal keyboard navigation logic
       document.addEventListener('keydown', function(event) {
         // Find if modal is open (using Bootstrap 'show' class convention)
         var modal = document.getElementById('imageModal');
         if (modal && modal.classList.contains('show') && currentImageIndex !== -1) {
           if (event.key === 'ArrowLeft') {
-            currentImageIndex = (currentImageIndex - 1 + imageElements.length) % imageElements.length;
-            var newImage = imageElements[currentImageIndex];
-            modalImage.src = newImage.getAttribute('data-full') || newImage.src;
+            navigateImage('prev');
           } else if (event.key === 'ArrowRight') {
-            currentImageIndex = (currentImageIndex + 1) % imageElements.length;
-            var newImage = imageElements[currentImageIndex];
-            modalImage.src = newImage.getAttribute('data-full') || newImage.src;
+            navigateImage('next');
           }
         }
       });
+
+      // Modal button navigation logic
+      var prevBtn = document.getElementById('modalPrevBtn');
+      var nextBtn = document.getElementById('modalNextBtn');
+      if (prevBtn) prevBtn.addEventListener('click', function() { navigateImage('prev'); });
+      if (nextBtn) nextBtn.addEventListener('click', function() { navigateImage('next'); });
 
       // Carousel navigation logic
       const track = document.getElementById('imageTrack');

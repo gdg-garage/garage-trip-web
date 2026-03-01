@@ -42,7 +42,7 @@ export default function RegisterForm() {
     foodRestrictions: '',
     note: '',
   });
-  const [formMessage, setFormMessage] = useState<{ text: string; type: string } | null>(null);
+  const [formMessage, setFormMessage] = useState<{ text: React.ReactNode; type: string } | null>(null);
   const [errorHtml, setErrorHtml] = useState('');
   const [history, setHistory] = useState<RegistrationHistoryItem[]>([]);
 
@@ -157,7 +157,19 @@ export default function RegisterForm() {
       });
 
       if (response.ok) {
-        setFormMessage({ text: 'Registration updated successfully!', type: 'text-success' });
+        setFormMessage({
+          text: (
+            <>
+              Registration updated successfully!<br />
+              Don't forget to check the{' '}
+              <a href="/payment" className="secondary-color text-decoration-underline">
+                /payment
+              </a>{' '}
+              page for payment instructions.
+            </>
+          ),
+          type: 'text-success',
+        });
         // store the updated registration info in state to update the form immediately
         setRegistrationInfo(data);
 
@@ -234,7 +246,7 @@ export default function RegisterForm() {
               to register for the event.
             </p>
             <div className="d-flex justify-content-center mt-3">
-              <a href={`${API_BASE_URL}/auth/discord/login`} className="button blue big" target='_blank'>
+              <a href={`${API_BASE_URL}/auth/discord/login`} className="button blue big" target="_blank" rel="noopener noreferrer">
                 <i className="bi bi-discord"></i> Login via Discord
               </a>
             </div>
@@ -264,12 +276,16 @@ export default function RegisterForm() {
     <div className="row mt-4">
       <div className="col-lg-8 offset-lg-2">
         <div className="box">
-          <h3>Register for Event 7.0.0;</h3>
+          <h3>register for event 7.0.0;</h3>
           <p>
             Welcome, <span className="secondary-color">{username}</span>!
           </p>
 
           <div className="mt-4 p-3 border border-secondary rounded bg-dark mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary pb-1">
+              <h4 className="mb-0 small fw-bold text-secondary">registration status;</h4>
+              <div className="text-secondary small monospace">/status</div>
+            </div>
             <div className="row gy-2">
               <div className="col-12 d-flex justify-content-between">
                 <div>
@@ -290,9 +306,17 @@ export default function RegisterForm() {
                       {paid ? 'paid;' : 'payment pending;'}
                     </span>
                   </div>
-                  <a href="/payment" className="secondary-color small">
-                    payment info
-                  </a>
+                  <div className="d-flex align-items-center">
+                    {paid ? (
+                      <a href="/payment" className="secondary-color small">
+                        payment info
+                      </a>
+                    ) : (
+                      <a href="/payment" className="button purple small py-1 px-3">
+                        pay now
+                      </a>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -312,7 +336,7 @@ export default function RegisterForm() {
           {history.length > 0 && (
             <div className="mt-5 pt-4 border-top border-secondary">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h4 className="mb-0">Registration History;</h4>
+                <h4 className="mb-0">registration history;</h4>
                 <div className="text-secondary small">/log</div>
               </div>
               <div className="history-list small">

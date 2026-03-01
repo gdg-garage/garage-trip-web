@@ -16,10 +16,10 @@ $radius: 2rem;
 $breakpoint-desktop: '(min-width: 380px)';
 
 @mixin main-font {
-  font-family: "JetBrains Mono", monospace;
-  font-optical-sizing: auto;
-  font-weight: 800;
-  font-style: normal;
+	font-family: "JetBrains Mono", monospace;
+	font-optical-sizing: auto;
+	font-weight: 800;
+	font-style: normal;
 }
 
 :root {
@@ -31,4 +31,5 @@ $breakpoint-desktop: '(min-width: 380px)';
 	--blue-discord: #{$c-blue-discord};
 	--purple: #{$c-purple};
 	--yellow: #{$c-yellow};
+	--gray-text: #{$c-text-gray};
 }
