@@ -1,33 +1,42 @@
 ---
 import Default from '../layouts/Default.astro';
+import { Image } from 'astro:assets';
+import qrPayment from '../assets/images/qr_payment.png';
 ---
 
 <Default title="Payment" activeId="payment">
   <div class="row mt-4">
     <div class="col-lg-8 offset-lg-2">
       <div class="box">
-        <h3>Payment Information;</h3>
+        <h3>payment information;</h3>
         <p>
           To finalize your registration for <strong>garage::trip::7.0.0</strong>, a registration fee
           is required.
         </p>
 
         <div class="payment-details mt-4 p-4 border border-secondary rounded bg-dark">
-          <h4 class="secondary-color mb-3">Registration Fee: 3000 CZK</h4>
-          <p class="mb-2 text-secondary">Please send the payment to the following account:</p>
-          <div class="table-responsive">
-            <table class="table table-borderless align-middle mb-0">
-              <tbody>
-                <tr>
-                  <td class="text-secondary small py-1" style="width: 160px; min-width: 160px;"><strong>Account Number:</strong></td>
-                  <td class="fs-2 fw-bold monospace text-white py-1">7289978676/5500</td>
-                </tr>
-                <tr>
-                  <td class="text-secondary small py-1"><strong>Note for recipient:</strong></td>
-                  <td class="fs-5 fw-bold monospace text-white py-1">[Your email address]</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="row align-items-center gy-4">
+            <div class="col-md-7">
+              <h4 class="secondary-color mb-3">registration fee: 3000 CZK</h4>
+              <p class="mb-2 text-secondary">Please send the payment to the following account:</p>
+              <div class="table-responsive">
+                <table class="table table-borderless align-middle mb-0">
+                  <tbody>
+                    <tr>
+                      <td class="text-secondary small py-1" style="width: 140px; min-width: 140px;"><strong>Account Number:</strong></td>
+                      <td class="fs-4 fw-bold monospace text-white py-1">7289978676/5500</td>
+                    </tr>
+                    <tr>
+                      <td class="text-secondary small py-1"><strong>Note for recipient:</strong></td>
+                      <td class="fs-5 fw-bold monospace text-white py-1">[Your email address]</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="col-md-5 text-center">
+              <Image src={qrPayment} alt="QR Payment" class="img-fluid rounded border border-secondary bg-white p-2" width={250} />
+            </div>
           </div>
           <p class="mt-4 mb-0" style="font-size: 0.75rem; color: #6c757d; font-style: italic;">
             * If you do not have CZK, please contact us.
@@ -36,7 +45,7 @@ import Default from '../layouts/Default.astro';
 
         <div class="mt-4">
           <div class="alert alert-info bg-dark border-info text-info-emphasis p-4">
-            <h5 class="alert-heading fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>Manual Processing</h5>
+            <h5 class="alert-heading fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>manual processing</h5>
             <p class="mb-0 text-info">
               Please note that all payments are <strong>processed manually</strong> by our team. 
               As such, please <strong>expect delays</strong> of several days before your payment is reflected in the system. 
@@ -46,7 +55,7 @@ import Default from '../layouts/Default.astro';
         </div>
 
         <div class="mt-5">
-          <h4 class="mb-3">All-inclusive;</h4>
+          <h4 class="mb-3">all-inclusive;</h4>
           <p class="text-secondary small mb-3">
             The event is <strong>completely all-inclusive</strong>. We have decided not to track individual consumption for financial purposes during the event. 
           </p>
@@ -62,7 +71,7 @@ import Default from '../layouts/Default.astro';
         </div>
 
         <div class="mt-5">
-          <h4 class="mb-3">Price Calculation;</h4>
+          <h4 class="mb-3">price calculation;</h4>
           <p class="text-secondary small mb-3">
             Our pricing is designed to be fair and transparent, distributing the total event costs 
             among all participants. We use an exponential model (exponent 0.6) to calculate individual 
@@ -79,7 +88,7 @@ import Default from '../layouts/Default.astro';
         </div>
 
         <div class="mt-5">
-          <h4 class="mb-3">Cancellation Policy;</h4>
+          <h4 class="mb-3">cancellation policy;</h4>
           <p class="text-secondary small mb-3">
             If you need to cancel your registration, the following cancellation fees (calculated from the registration fee) apply based on when you notify us:
           </p>
@@ -87,8 +96,8 @@ import Default from '../layouts/Default.astro';
             <table class="table custom-table">
               <thead>
                 <tr>
-                  <th>Time before event;</th>
-                  <th>Cancellation fee;</th>
+                  <th>time before event;</th>
+                  <th>cancellation fee;</th>
                 </tr>
               </thead>
               <tbody>

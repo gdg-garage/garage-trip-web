@@ -19,6 +19,11 @@ body {
   font-family: Helvetica, Sans-Serif;
 }
 
+.form-control::placeholder {
+  color: $blue-help;
+  opacity: 1; /* Firefox */
+}
+
 .secondary-color {
     color: $c-blue-discord;
 }

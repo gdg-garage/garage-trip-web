@@ -82,7 +82,7 @@ export default function UserProfile() {
             <div className="row justify-content-center mt-5">
                 <div className="col-md-6">
                     <div className="box text-danger">
-                        <h3>Error;</h3>
+                        <h3>error;</h3>
                         <p>{error}</p>
                         <button className="button light mt-3" onClick={() => location.reload()}>
                             Retry
@@ -98,12 +98,12 @@ export default function UserProfile() {
             <div className="row justify-content-center mt-5">
                 <div className="col-md-6">
                     <div className="box p-5 text-center">
-                        <h3 className="mb-4 text-start">Authentication Required;</h3>
+                        <h3 className="mb-4 text-start">authentication required;</h3>
                         <p className="mb-5 text-start">
                             You need to be logged in to view your profile.
                         </p>
                         <div className="d-flex justify-content-center">
-                            <a href={`${API_BASE_URL}/auth/discord/login`} className="button blue big w-100">
+                            <a href={`${API_BASE_URL}/auth/discord/login`} className="button blue big w-100" target="_blank" rel="noopener noreferrer">
                                 <i className="bi bi-discord me-2"></i> Login via Discord
                             </a>
                         </div>
@@ -118,7 +118,7 @@ export default function UserProfile() {
             <div className="col-lg-6 offset-lg-3">
                 <div className="box">
                     <div className="d-flex justify-content-between align-items-center mb-5">
-                        <h3 className="mb-0">Profile;</h3>
+                        <h3 className="mb-0">profile;</h3>
                         <button onClick={handleLogout} className="button light">
                             <i className="bi bi-box-arrow-right me-2"></i> Logout
                         </button>

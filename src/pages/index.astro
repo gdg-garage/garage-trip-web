@@ -54,7 +54,7 @@ const phrases = [
     <div class="col-lg-4">
       <div class="box info-box">
         <div class="info-box-inner">
-          <h3>Save the date;</h3>
+          <h3>save the date;</h3>
           <p class="subtitle">12&nbsp;&ndash;&nbsp;19&nbsp;/&nbsp;9&nbsp;/&nbsp;2026</p>
           <div class="info-box-inner-footer">
             <ButtonLink
@@ -75,7 +75,7 @@ const phrases = [
           height="224"
         />
         <div class="info-box-inner">
-          <h3>Location;</h3>
+          <h3>location;</h3>
           <p class="subtitle">
             Chalupa Nový Svět<br />
             Prostřední Lipka 74<br />
@@ -101,7 +101,7 @@ const phrases = [
           height="225"
         />
         <div class="info-box-inner">
-          <h3>Accommodation;</h3>
+          <h3>accommodation;</h3>
           <p class="subtitle">Cottage "Novy Svet"</p>
           <ul class="accommodation-features">
             <li>32 beds | 14 rooms</li>
@@ -125,7 +125,7 @@ const phrases = [
   <div class="row mb-4">
     <div class="col">
       <div class="box">
-        <h3>Invitation</h3>
+        <h3>invitation;</h3>
         <ul>
           <li>
             <strong>Major version update</strong>: from <a href="/history" target="_blank">six</a>{' '}
@@ -149,7 +149,7 @@ const phrases = [
   <div class="row mb-4">
     <div class="col">
       <div class="box">
-        <h3>Feedback</h3>
+        <h3>feedback;</h3>
         <div class="row gy-3">
           <div class="col-lg-4">
             <div class="comment-box p-3"><em>Nerdvana.</em></div>
@@ -168,17 +168,15 @@ const phrases = [
   <div class="row mb-4">
     <div class="col">
       <div class="box images position-relative">
-        <h3>Images</h3>
-          <ImagesCarousel />
-        </div>
+        <h3>images;</h3>
+        <ImagesCarousel />
       </div>
     </div>
   </div>
-
   <div class="row mb-4">
     <div class="col">
       <div class="box" id="schedule">
-        <h3>Schedule</h3>
+        <h3>schedule;</h3>
         <p class="mb-4">
           <em>
             This schedule is preliminary.<br />
@@ -262,46 +260,4 @@ const phrases = [
       </div>
     </div>
   </div>
-
-  <script is:inline>
-    // document.addEventListener('DOMContentLoaded', function () {
-    //   // Modal swap logic
-    //   var modalImage = document.getElementById('modalImage');
-    //   var imageElements = Array.from(document.querySelectorAll('#imageTrack img'));
-    //   var currentImageIndex = -1;
-
-    //   imageElements.forEach(function (image, index) {
-    //     image.addEventListener('click', function () {
-    //       currentImageIndex = index;
-    //       modalImage.src = image.getAttribute('data-full') || image.src;
-    //     });
-    //   });
-
-    //   // Modal keyboard navigation logic
-    //   document.addEventListener('keydown', function(event) {
-    //     // Find if modal is open (using Bootstrap 'show' class convention)
-    //     var modal = document.getElementById('imageModal');
-    //     if (modal && modal.classList.contains('show') && currentImageIndex !== -1) {
-    //       if (event.key === 'ArrowLeft') {
-    //         currentImageIndex = (currentImageIndex - 1 + imageElements.length) % imageElements.length;
-    //         var newImage = imageElements[currentImageIndex];
-    //         modalImage.src = newImage.getAttribute('data-full') || newImage.src;
-    //       } else if (event.key === 'ArrowRight') {
-    //         currentImageIndex = (currentImageIndex + 1) % imageElements.length;
-    //         var newImage = imageElements[currentImageIndex];
-    //         modalImage.src = newImage.getAttribute('data-full') || newImage.src;
-    //       }
-    //     }
-    //   });
-
-    //   // Carousel navigation logic
-    //   var track = document.getElementById('imageTrack');
-    //   document.getElementById('scrollLeftBtn').addEventListener('click', function() {
-    //     track.scrollBy({ left: -315, behavior: 'smooth' });
-    //   });
-    //   document.getElementById('scrollRightBtn').addEventListener('click', function() {
-    //     track.scrollBy({ left: 315, behavior: 'smooth' });
-    //   });
-    // });
-  </script>
 </Default>
