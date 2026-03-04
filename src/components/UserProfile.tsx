@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
+import { PUBLIC_API_BASE_URL } from 'astro:env/client';
 
-const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://api.garage-trip.cz';
 const EVENT_ID = 'g::t::7.0.0';
 
 interface MeData {
@@ -16,7 +16,7 @@ export default function UserProfile() {
 
     const checkAuth = useCallback(async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/me?event=${EVENT_ID}`, {
+            const response = await fetch(`${PUBLIC_API_BASE_URL}/me?event=${EVENT_ID}`, {
                 headers: { Accept: 'application/json' },
                 credentials: 'include',
             });
@@ -43,7 +43,7 @@ export default function UserProfile() {
     const handleLogout = useCallback(async (e: React.MouseEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+            const response = await fetch(`${PUBLIC_API_BASE_URL}/auth/logout`, {
                 method: 'GET', // or POST if required, but usually GET for simple logout links
                 credentials: 'include',
             });
@@ -58,7 +58,7 @@ export default function UserProfile() {
         } catch (error) {
             console.error('Logout failed:', error);
             // If fetch fails, still try to redirect to the logout URL directly
-            window.location.href = `${API_BASE_URL}/auth/logout`;
+            window.location.href = `${PUBLIC_API_BASE_URL}/auth/logout`;
         }
     }, []);
 
@@ -97,13 +97,17 @@ export default function UserProfile() {
         return (
             <div className="row justify-content-center mt-5">
                 <div className="col-md-6">
-                    <div className="box p-5 text-center">
-                        <h3 className="mb-4 text-start">authentication required;</h3>
-                        <p className="mb-5 text-start">
+                    <div className="box p-5">
+                        <h3 className="mb-4">authentication required;</h3>
+                        <p className="mb-4">
                             You need to be logged in to view your profile.
                         </p>
-                        <div className="d-flex justify-content-center">
-                            <a href={`${API_BASE_URL}/auth/discord/login`} className="button blue big w-100" target="_blank" rel="noopener noreferrer">
+                        <div className="d-flex justify-content-center mt-3">
+                            <a
+                                href={`${PUBLIC_API_BASE_URL}/auth/discord/login`}
+                                className="button purple big"
+                                onClick={() => sessionStorage.setItem('login_redirect', '/user')}
+                            >
                                 <i className="bi bi-discord me-2"></i> Login via Discord
                             </a>
                         </div>

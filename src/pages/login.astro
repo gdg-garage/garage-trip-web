@@ -1,0 +1,41 @@
+---
+import Default from '../layouts/Default.astro';
+import { PUBLIC_API_BASE_URL } from 'astro:env/client';
+
+const apiBaseUrl = PUBLIC_API_BASE_URL;
+---
+
+
+<Default title="Authentication Required">
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+      <div class="box p-5 text-center">
+        <h3 class="mb-4 text-start">authentication required;</h3>
+        <p class="mb-5 text-start">
+          You need to be logged in to view this page.
+        </p>
+        <div class="d-flex justify-content-center mt-3">
+          <a href={`${apiBaseUrl}/auth/discord/login`} class="button purple big" id="login-button">
+            <i class="bi bi-discord me-2"></i> Login via Discord
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Default>
+
+<script is:inline>
+  // Save redirect URL from query param to sessionStorage if present
+  const urlParams = new URLSearchParams(window.location.search);
+  const redirect = urlParams.get('redirect');
+  if (redirect) {
+    sessionStorage.setItem('login_redirect', redirect);
+    console.log('Saved redirect target:', redirect);
+  }
+</script>
+
+<style>
+  .box {
+    margin-top: 2rem;
+  }
+</style>

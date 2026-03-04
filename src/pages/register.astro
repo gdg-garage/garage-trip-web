@@ -1,11 +1,17 @@
 ---
 import Default from '../layouts/Default.astro';
 import RegisterForm from '../components/RegisterForm';
+import AuthGuard from '../components/auth/AuthGuard';
 ---
 
+
+
 <Default title="Register" activeId="register">
-  <RegisterForm client:load />
+  <AuthGuard client:load>
+    <RegisterForm client:load />
+  </AuthGuard>
 </Default>
+
 
 <style>
   :global(.form-control:focus) {

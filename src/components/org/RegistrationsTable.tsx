@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { PUBLIC_API_BASE_URL } from 'astro:env/client';
 import clsx from 'clsx';
 
-const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://api.garage-trip.cz';
 const EVENT_ID = 'g::t::7.0.0';
 
 interface UserRegistration {
@@ -26,7 +26,7 @@ export default function RegistrationsTable() {
         try {
             setLoading(true);
             setError(null);
-            const response = await fetch(`${API_BASE_URL}/registrations?event=${EVENT_ID}`, {
+            const response = await fetch(`${PUBLIC_API_BASE_URL}/registrations?event=${EVENT_ID}`, {
                 headers: { Accept: 'application/json' },
                 credentials: 'include',
             });

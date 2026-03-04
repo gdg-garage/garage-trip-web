@@ -1,6 +1,8 @@
 ---
 import Default from './Default.astro';
 import OrgMenu from '../components/org/OrgMenu.astro';
+import AuthGuard from '../components/auth/AuthGuard';
+
 
 interface Props {
   title: string;
@@ -17,7 +19,9 @@ const { title, activeTab } = Astro.props;
         <h1 class="mb-4">Organization Dashboard;</h1>
         <OrgMenu activeTab={activeTab} />
         <div class="org-content mt-4">
-          <slot />
+          <AuthGuard client:load>
+            <slot />
+          </AuthGuard>
         </div>
       </div>
     </div>

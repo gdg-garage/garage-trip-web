@@ -9,8 +9,10 @@ interface Props {
 }
 
 const { title, activeId } = Astro.props;
-const gaId = import.meta.env.PUBLIC_GA_ID || 'G-TF98L99080';
+import { PUBLIC_GA_ID } from 'astro:env/client';
+const gaId = PUBLIC_GA_ID;
 ---
+
 
 <!doctype html>
 <html lang="en" class="h-100" data-bs-theme="dark">
@@ -46,6 +48,19 @@ const gaId = import.meta.env.PUBLIC_GA_ID || 'G-TF98L99080';
     }
     gtag('js', new Date());
     gtag('config', gaId);
+  </script>
+
+  <script is:inline>
+    // Handle redirecting back after login
+    // If we are on the home page and have a saved redirect, we should try to navigate there
+    if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+      const redirect = sessionStorage.getItem('login_redirect');
+      if (redirect) {
+        sessionStorage.removeItem('login_redirect');
+        console.log('Found saved redirect after login, navigating to:', redirect);
+        window.location.href = redirect;
+      }
+    }
   </script>
 
   <!-- Bootstrap JS from CDN -->

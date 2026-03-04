@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import clsx from 'clsx';
+import { PUBLIC_API_BASE_URL } from 'astro:env/client';
 
-const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://api.garage-trip.cz';
+import clsx from 'clsx';
 
 interface APIKey {
     id: number;
@@ -22,7 +22,7 @@ export default function APIKeyManager() {
     const fetchKeys = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${API_BASE_URL}/api-keys`, {
+            const response = await fetch(`${PUBLIC_API_BASE_URL}/api-keys`, {
                 credentials: 'include',
                 headers: { Accept: 'application/json' },
             });
@@ -52,7 +52,7 @@ export default function APIKeyManager() {
             const expiresAt = new Date();
             expiresAt.setFullYear(expiresAt.getFullYear() + 1); // Default to 1 year
 
-            const response = await fetch(`${API_BASE_URL}/api-keys`, {
+            const response = await fetch(`${PUBLIC_API_BASE_URL}/api-keys`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
                 credentials: 'include',
@@ -80,7 +80,7 @@ export default function APIKeyManager() {
         if (!confirm('Are you sure you want to delete this API key?')) return;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api-keys/${id}`, {
+            const response = await fetch(`${PUBLIC_API_BASE_URL}/api-keys/${id}`, {
                 method: 'DELETE',
                 credentials: 'include',
             });

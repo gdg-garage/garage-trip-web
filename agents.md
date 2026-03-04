@@ -44,3 +44,11 @@ if (value === 'yes') {
 ```tsx
 const className = isActive ? 'active' : 'inactive'; // ✓ OK
 ```
+
+## Tools and Environment
+
+### Preferred Package Manager: Yarn
+
+**Rule:** Always use `yarn` for managing dependencies and running scripts in this project.
+
+**Why:** The project is configured with a `yarn.lock` file and `packageManager` field in `package.json` pointing to Yarn. Using `npm` can lead to lockfile inconsistencies.

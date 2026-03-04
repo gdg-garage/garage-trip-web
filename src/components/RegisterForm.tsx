@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
 import type { RegistrationInfo, JoiningStatus, RegistrationHistoryItem } from './regisration.types';
 import EventRegistrationForm from './EventRegistrationForm';
+import { PUBLIC_API_BASE_URL } from 'astro:env/client';
 
-const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://api.garage-trip.cz';
 const EVENT_ID = 'g::t::7.0.0';
 const DEFAULT_ARRIVAL_DATE = '2026-09-12';
 const DEFAULT_DEPARTURE_DATE = '2026-09-19';
@@ -48,7 +48,7 @@ export default function RegisterForm() {
 
   const checkAuth = useCallback(async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/me?event=${EVENT_ID}`, {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/me?event=${EVENT_ID}`, {
         headers: { Accept: 'application/json' },
         credentials: 'include',
       });
@@ -91,7 +91,7 @@ export default function RegisterForm() {
 
   const fetchHistory = useCallback(async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/history?event=${EVENT_ID}&diff=false`, {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/history?event=${EVENT_ID}&diff=false`, {
         headers: { Accept: 'application/json' },
         credentials: 'include',
       });
@@ -149,7 +149,7 @@ export default function RegisterForm() {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/register`, {
+      const response = await fetch(`${PUBLIC_API_BASE_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         credentials: 'include',
@@ -174,7 +174,7 @@ export default function RegisterForm() {
         setRegistrationInfo(data);
 
         if (isJoining) {
-          const meResponse = await fetch(`${API_BASE_URL}/user?event=${EVENT_ID}`, {
+          const meResponse = await fetch(`${PUBLIC_API_BASE_URL}/user?event=${EVENT_ID}`, {
             credentials: 'include',
           });
           if (meResponse.ok) {
@@ -246,8 +246,12 @@ export default function RegisterForm() {
               to register for the event.
             </p>
             <div className="d-flex justify-content-center mt-3">
-              <a href={`${API_BASE_URL}/auth/discord/login`} className="button blue big" target="_blank" rel="noopener noreferrer">
-                <i className="bi bi-discord"></i> Login via Discord
+              <a
+                href={`${PUBLIC_API_BASE_URL}/auth/discord/login`}
+                className="button purple big"
+                onClick={() => sessionStorage.setItem('login_redirect', '/register')}
+              >
+                <i className="bi bi-discord me-2"></i> Login via Discord
               </a>
             </div>
           </div>

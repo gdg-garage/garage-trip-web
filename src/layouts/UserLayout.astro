@@ -1,6 +1,8 @@
 ---
 import Default from './Default.astro';
 import UserMenu from '../components/user/UserMenu.astro';
+import AuthGuard from '../components/auth/AuthGuard';
+
 
 interface Props {
   title: string;
@@ -17,7 +19,9 @@ const { title, activeTab } = Astro.props;
         <h1 class="mb-4">user settings;</h1>
         <UserMenu activeTab={activeTab} />
         <div class="user-content mt-4">
-          <slot />
+          <AuthGuard client:load>
+            <slot />
+          </AuthGuard>
         </div>
       </div>
     </div>

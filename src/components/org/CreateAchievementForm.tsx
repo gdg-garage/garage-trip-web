@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import clsx from 'clsx';
-
-const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://api.garage-trip.cz';
+import { PUBLIC_API_BASE_URL } from 'astro:env/client';
 
 export default function CreateAchievementForm() {
     const [name, setName] = useState('');
@@ -35,7 +33,7 @@ export default function CreateAchievementForm() {
         setLoading(true);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/achievements/create`, {
+            const response = await fetch(`${PUBLIC_API_BASE_URL}/achievements/create`, {
                 method: 'POST',
                 body: formData,
                 credentials: 'include',
@@ -152,3 +150,4 @@ export default function CreateAchievementForm() {
         </div>
     );
 }
+

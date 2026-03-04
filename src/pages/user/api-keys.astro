@@ -1,8 +1,13 @@
 ---
 import UserLayout from '../../layouts/UserLayout.astro';
 import APIKeyManager from '../../components/user/APIKeyManager.tsx';
+import AuthGuard from '../../components/auth/AuthGuard';
 ---
 
+
 <UserLayout title="API Key Management" activeTab="api-keys">
-  <APIKeyManager client:load />
+  <AuthGuard client:load>
+    <APIKeyManager client:load />
+  </AuthGuard>
 </UserLayout>
+
