@@ -11,6 +11,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const PRAGUE_TIMEZONE = 'Europe/Prague';
+const DAYS_IN_WEEK_COUNT = 7;
 
 interface IDay {
   date: dayjs.Dayjs;
@@ -31,8 +32,8 @@ let currentDay = firstDayOfCalendar;
 
 const days: IDay[] = [];
 const maskedDays: IDay[] = [];
-for (let i = 0; i < 28; i++) {
-  if (i >= 14) {
+for (let i = 0; i < DAYS_IN_WEEK_COUNT * 4; i++) {
+  if (i >= DAYS_IN_WEEK_COUNT * 2) {
     maskedDays.push({
       date: currentDay,
       isStart: false,
