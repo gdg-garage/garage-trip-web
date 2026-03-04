@@ -26,7 +26,7 @@ export default function UserHeaderLink({ activeId }: Props) {
         checkAuth();
     }, []);
 
-    if (!isAuthorized) {
+    if (!isAuthorized && activeId !== 'user') {
         return null;
     }
 
