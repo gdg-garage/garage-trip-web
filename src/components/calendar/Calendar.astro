@@ -1,9 +1,16 @@
 ---
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 interface Props {
   startDate: `${number}-${number}-${number}`;
   endDate: `${number}-${number}-${number}`;
 }
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const PRAGUE_TIMEZONE = 'Europe/Prague';
 
 interface IDay {
   date: dayjs.Dayjs;
@@ -15,8 +22,8 @@ interface IDay {
 
 const { startDate, endDate } = Astro.props;
 
-const startDateObj = dayjs(startDate);
-const endDateObj = dayjs(endDate);
+const startDateObj = dayjs.tz(startDate, PRAGUE_TIMEZONE);
+const endDateObj = dayjs.tz(endDate, PRAGUE_TIMEZONE);
 const startDay = startDateObj.day();
 const firstDayOfCalendar = startDateObj.subtract(startDay, 'day');
 
