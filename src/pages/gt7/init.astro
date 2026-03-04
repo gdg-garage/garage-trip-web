@@ -488,10 +488,6 @@ const wsUrlBase = PUBLIC_INIT_WS_URL;
                     credentials: 'include'
                 });
                 
-                if (response.status === 200 || response.status === 409) {
-                    fetchAndShowImage();
-                }
-
                 const data = await response.json();
                 console.log('Auto-grant achievement response:', data);
             } catch (error) {
