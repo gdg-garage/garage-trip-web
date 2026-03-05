@@ -1,3 +1,4 @@
+@use "sass:color";
 @import "colors.scss";
 
 $primary: $c-purple;
@@ -235,7 +236,7 @@ h6 {
     background-color: $c-gray;
 
     &:hover {
-        background-color: transparentize($c-gray, .2);
+        background-color: color.change($c-gray, $alpha: 0.8);
     }
 }
 
@@ -243,7 +244,7 @@ h6 {
     background-color: $c-blue;
 
     &:hover {
-        background-color: transparentize($c-blue, .2);
+        background-color: color.change($c-blue, $alpha: 0.8);
     }
 }
 
@@ -251,7 +252,7 @@ h6 {
     background-color: $c-purple;
 
     &:hover {
-        background-color: transparentize($c-purple, .2);
+        background-color: color.change($c-purple, $alpha: 0.8);
     }
 }
 
@@ -259,7 +260,7 @@ a {
     color: $text;
 
     &:not(.button):hover {
-        color: darken($c-blue-light, 10%);
+        color: color.scale($c-blue-light, $lightness: -15%);
     }
 }
 

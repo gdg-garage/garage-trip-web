@@ -7,4 +7,16 @@ export default defineConfig({
   site: 'https://garage-trip.cz',
   output: 'static',
   integrations: [react(), sitemap()],
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          quietDeps: true,
+          silenceDeprecations: [
+            'import'
+          ],
+        }
+      }
+    }
+  }
 });
