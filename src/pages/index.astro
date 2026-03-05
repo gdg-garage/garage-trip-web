@@ -1,7 +1,7 @@
 ---
 import Default from '../layouts/Default.astro';
 import ButtonLink from '../components/ButtonLink.astro';
-import TextScramble from '../components/TextScramble.astro';
+import TextScramble from '../components/TextScramble/TextScramble';
 import ImagesCarousel from '@/components/carousel/ImagesCarousel.astro';
 import Calendar from '@/components/calendar/Calendar.astro';
 
@@ -28,7 +28,7 @@ const phrases = [
         >
       </h1>
       <p>
-        <TextScramble phrases={phrases} />
+        <TextScramble phrases={phrases} client:load />
       </p>
     </div>
 
