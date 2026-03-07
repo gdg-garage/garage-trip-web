@@ -1,0 +1,165 @@
+---
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+interface Props {
+  startDate: `${number}-${number}-${number}`;
+  endDate: `${number}-${number}-${number}`;
+}
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const PRAGUE_TIMEZONE = 'Europe/Prague';
+const DAYS_IN_WEEK_COUNT = 7;
+
+interface IDay {
+  date: dayjs.Dayjs;
+  isStart: boolean;
+  isEnd: boolean;
+  isPartOfRange: boolean;
+  hasLine: boolean;
+}
+
+const { startDate, endDate } = Astro.props;
+
+const startDateObj = dayjs.tz(startDate, PRAGUE_TIMEZONE);
+const endDateObj = dayjs.tz(endDate, PRAGUE_TIMEZONE);
+const startDay = startDateObj.day();
+const firstDayOfCalendar = startDateObj.subtract(startDay, 'day');
+
+let currentDay = firstDayOfCalendar;
+
+const days: IDay[] = [];
+const maskedDays: IDay[] = [];
+for (let i = 0; i < DAYS_IN_WEEK_COUNT * 4; i++) {
+  if (i >= DAYS_IN_WEEK_COUNT * 2) {
+    maskedDays.push({
+      date: currentDay,
+      isStart: false,
+      isEnd: false,
+      isPartOfRange: false,
+      hasLine: false,
+    })
+    currentDay = currentDay.add(1, 'day');
+    continue;
+  }
+  const isStart = currentDay.isSame(startDateObj, 'date')
+  const isEnd = currentDay.isSame(endDateObj, 'date');
+  const isPartOfRange = currentDay.isAfter(startDateObj, 'date') && currentDay.isBefore(endDateObj, 'date');
+  days.push({
+    date: currentDay,
+    isStart,
+    isEnd,
+    isPartOfRange,
+    hasLine: (isStart || isPartOfRange) && !isEnd && currentDay.day() !== 6,
+  })
+
+  currentDay = currentDay.add(1, 'day');
+}
+---
+
+<div class="calendar">
+  <div class="calendar_header">
+    <div>Mon</div>
+    <div>Tue</div>
+    <div>Wed</div>
+    <div>Thu</div>
+    <div>Fri</div>
+    <div>Sat</div>
+    <div>Sun</div>
+  </div>
+  <div class="calendar_grid">
+    {days.map((day) => (
+      <div class:list={['calendar_day_wrapper', { 'has-line': day.hasLine }]}>
+        <div class:list={['calendar_day', {start: day.isStart, end: day.isEnd, 'part-of-range': day.isPartOfRange}]}>
+          {day.date.date()}
+        </div>
+      </div>
+    ))}
+  </div>
+  <div class="calendar_grid calendar_grid--masked">
+    {maskedDays.map((day) => (
+      <div class="calendar_day_wrapper">
+        <div class="calendar_day">
+          {day.date.date()}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style is:global>
+  .calendar {
+    font-family: "JetBrains Mono", monospace;
+  }
+
+  .calendar_header {
+    display: flex;
+    padding: 0 8px;
+    gap: 8px;
+    justify-content: space-between;
+
+    font-weight: bold;
+    font-size: 0.75rem;
+    color: var(--blue-help);
+  }
+  .calendar_header > div {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .calendar_day_wrapper {
+    position: relative;
+    width: 48px;
+    height: 48px;
+  }
+
+  .calendar_day {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    font-size: 1.25rem;
+    font-weight: bold;
+    line-height: 2;
+    background-color: var(--blue-bg);
+    color: var(--blue-help);
+    position: relative;
+  }
+
+  .calendar_day.start,
+  .calendar_day.end {
+    background-color: var(--yellow);
+    color: var(--blue-dark);
+  }
+  .calendar_day.part-of-range {
+    background-color: var(--blue-help);
+    color: var(--blue-light);
+  }
+
+  .calendar_day_wrapper.has-line::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    top: calc(50% - 2px);
+    background-color: var(--blue-light);
+    left: 50%;
+  }
+
+  .calendar_grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+  .calendar_grid--masked {
+    margin-top: 8px;
+    mask-image: linear-gradient(#22282FAA, #1B1E2200);
+  }
+</style>

@@ -1,5 +1,0 @@
-sass:
-  style: compact
-
-exclude:
-  - README.md

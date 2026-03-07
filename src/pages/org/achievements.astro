@@ -1,0 +1,16 @@
+---
+import OrgLayout from '../../layouts/OrgLayout.astro';
+import CreateAchievementForm from '../../components/org/CreateAchievementForm';
+import AuthGuard from '../../components/auth/AuthGuard';
+---
+
+
+
+<OrgLayout title="Organization - Achievements" activeTab="achievements">
+  <AuthGuard client:load>
+    <div class="container py-4">
+      <CreateAchievementForm client:load />
+    </div>
+  </AuthGuard>
+</OrgLayout>
+

@@ -1,0 +1,14 @@
+---
+import OrgLayout from '../../layouts/OrgLayout.astro';
+import RegistrationsTable from '../../components/org/RegistrationsTable';
+import AuthGuard from '../../components/auth/AuthGuard';
+---
+
+
+
+<OrgLayout title="Organization - Registrations" activeTab="registrations">
+  <AuthGuard client:load>
+    <RegistrationsTable client:load />
+  </AuthGuard>
+</OrgLayout>
+

@@ -1,0 +1,616 @@
+---
+import Default from '../../layouts/Default.astro';
+import AuthGuard from '../../components/auth/AuthGuard';
+import { PUBLIC_API_BASE_URL, PUBLIC_INIT_WS_URL } from 'astro:env/client';
+
+const apiBaseUrl = PUBLIC_API_BASE_URL;
+const wsUrlBase = PUBLIC_INIT_WS_URL;
+---
+
+<Default title="gt::7::init_cipher">
+    <AuthGuard client:load>
+    <div class="cipher-page">
+        <h1 class="cipher-title">gt::7::init_cipher</h1>
+
+        <div class="cipher-grid" id="chunk-grid">
+            <!-- Chunks will be dynamically injected here -->
+            <div class="chunk" id="chunk-1">
+                <span class="chunk-id">1</span>
+                <span class="timer">00</span>
+                <div class="status-dot"></div>
+            </div>
+            <div class="chunk" id="chunk-2">
+                <span class="chunk-id">2</span>
+                <span class="timer">00</span>
+                <div class="status-dot"></div>
+            </div>
+            <div class="chunk" id="chunk-3">
+                <span class="chunk-id">3</span>
+                <span class="timer">00</span>
+                <div class="status-dot"></div>
+            </div>
+            <div class="chunk" id="chunk-4">
+                <span class="chunk-id">4</span>
+                <span class="timer">00</span>
+                <div class="status-dot"></div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="cipher-trigger-btn" id="trigger-btn">join</button>
+        </div>
+
+        <div id="cipher-display" class="cipher-display-box"></div>
+
+        <div class="cipher-solve-container">
+            <form id="cipher-form" class="cipher-form">
+                <input 
+                    type="text" 
+                    id="cipher-input" 
+                    class="cipher-input" 
+                    placeholder="Enter the code..." 
+                    required
+                    autocomplete="off"
+                />
+                <button type="submit" id="cipher-submit" class="cipher-submit-btn">
+                    submit
+                </button>
+            </form>
+            <div id="cipher-image-container" class="cipher-image-container">
+                <img id="cipher-image" src="" alt="Cipher Challenge" class="cipher-image" />
+                <p class="cipher-image-text">respond using the same input</p>
+            </div>
+        </div>
+
+        <div id="cipher-notification" class="cipher-notification"></div>
+    </div>
+    </AuthGuard>
+</Default>
+
+<style lang="scss">
+    @use "sass:color";
+    @import "../../styles/colors.scss";
+    @import "../../styles/variables.scss";
+
+    .cipher-page {
+        --bg-color: #0d0f14;
+        --card-bg: #1a1d24;
+        --text-color: #e2e8f0;
+        --primary: #10b981;
+        --warning: #f59e0b;
+        --secondary: #64748b;
+        --accent: #3b82f6;
+        --error: #ef4444;
+        --glass: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+
+        min-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        color: var(--text-color);
+        position: relative;
+        padding: 8rem 2rem 4rem 2rem;
+        gap: 5rem;
+    }
+
+    .cipher-title {
+        font-size: 2.5rem;
+        background: linear-gradient(to right, #60a5fa, #10b981);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        margin: 0 0 2rem 0;
+    }
+
+    .cipher-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 2rem;
+        place-items: center;
+        width: 100%;
+        max-width: 800px;
+    }
+
+    @media (max-width: 600px) {
+        .cipher-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    :global(.chunk) {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(10px);
+        padding: 1.5rem;
+        border-radius: 50%;
+        aspect-ratio: 1 / 1;
+        width: 180px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+
+        &:hover {
+            transform: scale(1.02);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        &.waiting {
+            border-color: rgba(245, 158, 11, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.1);
+
+            :global(.status-dot) {
+                background: var(--warning);
+                box-shadow: 0 0 10px var(--warning);
+            }
+
+            :global(.timer) {
+                color: var(--warning);
+            }
+        }
+
+        &.active {
+            transform: translateY(-5px);
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.2);
+
+            :global(.timer) {
+                color: var(--primary);
+                display: block;
+            }
+
+            :global(.status-dot) {
+                background: var(--primary);
+                box-shadow: 0 0 15px var(--primary);
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    top: -2px;
+                    left: -2px;
+                    right: -2px;
+                    bottom: -2px;
+                    border-radius: 50%;
+                    border: 1px solid var(--primary);
+                    animation: pulse 2s infinite;
+                }
+            }
+        }
+    }
+
+    :global(.chunk-id) {
+        font-size: 0.875rem;
+        color: var(--secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.25rem;
+    }
+
+    :global(.timer) {
+        font-size: 3rem;
+        font-weight: 600;
+        color: var(--secondary);
+        transition: color 0.4s ease;
+        display: none;
+    }
+
+    :global(.status-dot) {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--secondary);
+        margin-top: 0.5rem;
+        position: relative;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.8; }
+        100% { transform: scale(2.5); opacity: 0; }
+    }
+
+    .cipher-trigger-btn {
+        background: linear-gradient(135deg, #3b82f6, #10b981);
+        color: white;
+        border: none;
+        padding: 1rem 3rem;
+        font-size: 1.125rem;
+        font-weight: 700;
+        border-radius: 100px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+
+        &:disabled {
+            background: var(--secondary);
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+    }
+
+    .cipher-solve-container {
+        max-width: 500px;
+        width: 100%;
+        margin: auto 0 0 0;
+        padding: 2rem 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .cipher-form {
+        display: flex;
+        align-items: center;
+        background: var(--glass);
+        padding: 6px;
+        border-radius: 100px;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(10px);
+        width: 100%;
+    }
+
+    .cipher-input {
+        background: transparent;
+        border: none;
+        color: white;
+        padding: 0.625rem 1rem 0.625rem 1.5rem;
+        flex: 1;
+        min-width: 100px;
+        outline: none;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1rem;
+
+        &::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+    }
+
+    .cipher-submit-btn {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        border-radius: 100px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+            transform: scale(1.05);
+            background: color.adjust(#3b82f6, $lightness: 5%);
+        }
+
+        &:active {
+            transform: scale(0.95);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+    }
+
+    .cipher-display-box {
+        padding: 1.5rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.25rem;
+        color: var(--primary);
+        display: none;
+        word-break: break-all;
+        width: 100%;
+        max-width: 500px;
+        backdrop-filter: blur(10px);
+        text-align: center;
+
+        &.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+    }
+
+    .cipher-notification {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 1rem 2rem;
+        border-radius: 1rem;
+        background: var(--card-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--text-color);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        transition: all 0.3s ease;
+        pointer-events: none;
+        z-index: 100;
+
+        &.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        &.success {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        &.error {
+            border-color: var(--error);
+            color: var(--error);
+        }
+    }
+
+    .cipher-image-container {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .cipher-image {
+        max-width: 100%;
+        border-radius: 1rem;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .cipher-image-text {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.875rem;
+        color: var(--secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<script is:inline define:vars={{ apiBaseUrl, wsUrlBase }}>
+    function init() {
+        const chunkGrid = document.getElementById('chunk-grid');
+        const triggerBtn = document.getElementById('trigger-btn');
+        const notification = document.getElementById('cipher-notification');
+        const cipherDisplay = document.getElementById('cipher-display');
+        const cipherForm = document.getElementById('cipher-form');
+        const cipherInput = document.getElementById('cipher-input');
+        const cipherSubmit = document.getElementById('cipher-submit');
+        const cipherImage = document.getElementById('cipher-image');
+        const cipherImageContainer = document.getElementById('cipher-image-container');
+
+        if (!triggerBtn || !chunkGrid || !cipherForm) {
+            // Elements not ready yet (AuthGuard still loading or not authorized)
+            setTimeout(init, 100);
+            return;
+        }
+
+        let socket;
+
+        async function fetchAndShowImage() {
+            try {
+                const userResponse = await fetch(`${apiBaseUrl}/me`, {
+                    headers: { Accept: 'application/json' },
+                    credentials: 'include',
+                });
+                if (!userResponse.ok) return;
+                const userData = await userResponse.json();
+                const email = userData.email;
+
+                const imgResponse = await fetch('https://init-cipher-7.garage-trip.cz/img', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `email=${encodeURIComponent(email)}`,
+                });
+                
+                if (imgResponse.ok) {
+                    const blob = await imgResponse.blob();
+                    const url = URL.createObjectURL(blob);
+                    cipherImage.src = url;
+                    cipherImageContainer.style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Error fetching cipher image:', error);
+            }
+        }
+
+        async function submitCipher(code) {
+            cipherSubmit.disabled = true;
+            try {
+                const response = await fetch(`${apiBaseUrl}/achievements/grant`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code: code }),
+                    credentials: 'include'
+                });
+                
+                if (response.status === 200) {
+                    showNotification('Achievement granted! You solved it.', 'success');
+                    cipherInput.value = '';
+                    fetchAndShowImage();
+                } else if (response.status === 409) {
+                    showNotification('You already have this achievement.', 'success');
+                    fetchAndShowImage();
+                } else if (response.status === 404 || response.status === 400) {
+                    showNotification('Incorrect code. Try again.', 'error');
+                } else {
+                    showNotification(`Error: HTTP ${response.status}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting cipher:', error);
+                showNotification('Network error. Check console.', 'error');
+            } finally {
+                cipherSubmit.disabled = false;
+            }
+        }
+
+        async function grantAchievement() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/achievements/grant`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code: 'gt7init' }),
+                    credentials: 'include'
+                });
+                
+                if (response.status === 200 || response.status === 409) {
+                    fetchAndShowImage();
+                }
+
+                const data = await response.json();
+                console.log('Auto-grant achievement response:', data);
+            } catch (error) {
+                console.error('Error granting auto-achievement:', error);
+            }
+        }
+
+        function showNotification(msg, type = '') {
+            notification.innerText = msg;
+            notification.className = 'cipher-notification show ' + type;
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function connect() {
+            let wsUrl = wsUrlBase;
+            if (!wsUrl.includes('://')) {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                wsUrl = `${protocol}//${wsUrl}`;
+            }
+
+            socket = new WebSocket(wsUrl);
+
+            socket.onopen = () => {
+                console.log('Connected to WebSocket');
+            };
+
+            socket.onclose = () => {
+                console.log('Disconnected from WebSocket');
+                setTimeout(connect, 2000);
+            };
+
+            socket.onerror = (error) => {
+                console.error('WebSocket Error:', error);
+            };
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+
+                if (data.chunks) {
+                    updateUI(data.chunks);
+                }
+
+                if (data.already_joined) {
+                    if (!data.error) {
+                        triggerBtn.disabled = true;
+                        triggerBtn.innerText = 'joined';
+                    }
+                }
+
+                if (data.can_rejoin) {
+                    triggerBtn.disabled = false;
+                    triggerBtn.innerText = 'join';
+                    cipherDisplay.classList.remove('show');
+                }
+
+                if (data.error) {
+                    showNotification(data.error);
+                }
+
+                if (data.cipher_chunk) {
+                    cipherDisplay.innerText = data.cipher_chunk;
+                    cipherDisplay.classList.add('show');
+                }
+            };
+        }
+
+        function updateUI(chunks) {
+            const activeIds = new Set(chunks.map(c => `chunk-${c.id}`));
+
+            chunkGrid.querySelectorAll('.chunk').forEach(el => {
+                if (!activeIds.has(el.id)) {
+                    el.remove();
+                }
+            });
+
+            chunks.forEach(chunk => {
+                let chunkEl = document.getElementById(`chunk-${chunk.id}`);
+                if (!chunkEl) {
+                    chunkEl = document.createElement('div');
+                    chunkEl.id = `chunk-${chunk.id}`;
+                    chunkEl.className = 'chunk';
+                    chunkEl.innerHTML = `
+                        <span class="chunk-id">${chunk.id}</span>
+                        <span class="timer">00</span>
+                        <div class="status-dot"></div>
+                    `;
+                    chunkGrid.appendChild(chunkEl);
+                }
+                const timerEl = chunkEl.querySelector('.timer');
+                timerEl.innerText = (chunk.timer || 0).toString().padStart(2, '0');
+
+                chunkEl.classList.remove('active', 'waiting');
+                if (chunk.status === 'green') {
+                    chunkEl.classList.add('active');
+                } else if (chunk.status === 'orange') {
+                    chunkEl.classList.add('waiting');
+                }
+            });
+        }
+
+        cipherForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const val = cipherInput.value.trim();
+            if (val) {
+                submitCipher(val);
+            }
+        });
+
+        triggerBtn.addEventListener('click', () => {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ action: 'join' }));
+            }
+        });
+
+        connect();
+        grantAchievement();
+    }
+
+    init();
+</script>

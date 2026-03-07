@@ -1,0 +1,35 @@
+.header {
+    padding: 0;
+    background-color: rgba($c-blue-dark, 0.8);
+    backdrop-filter:blur(8px);
+    
+    &-container {
+        flex-shrink: 0;
+        padding: 0 $header-container-padding-h;
+        min-height: 3.5rem;
+
+        @media #{$breakpoint-desktop} {
+            min-height: 4rem;
+        }
+    }
+
+    &-item {
+        padding: $header-container-padding-v 0;
+    }
+
+    .navbar-toggler {
+        padding: 0.125rem;
+    } 
+}
+
+.logo {
+    @include main-font;
+
+    &:hover,
+    &:active {
+        color: $c-white !important;
+    }
+
+    text-decoration: none;
+    color: $c-white;
+}

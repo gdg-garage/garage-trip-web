@@ -1,0 +1,23 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  url: string;
+  text: string;
+  variant?: string;
+  size?: string;
+  icon?: string;
+  target?: string;
+}
+
+const { url, text, variant = 'light', size, icon, target = '_blank' } = Astro.props;
+---
+
+<a href={url} class:list={['button', variant, size]} target={target}>
+  {icon && (
+    <span class="button-icon">
+      <Icon icon={icon} />
+    </span>
+  )}
+  {text}
+</a>

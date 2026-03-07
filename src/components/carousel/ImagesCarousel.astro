@@ -1,0 +1,144 @@
+---
+import './ImagesCarousel.scss';
+import { Image } from 'astro:assets';
+
+const mainImages = Object.values(import.meta.glob('/src/assets/images/g::t::7.0.0/*.{jpg,png}', { eager: true }));
+const allImages = mainImages.map((mod: any) => mod.default) as ImageMetadata[];
+allImages.sort((a, b) => {
+  const matchA = a.src.match(/hp_(\d+)/);
+  const matchB = b.src.match(/hp_(\d+)/);
+  return (matchA ? parseInt(matchA[1]) : 0) - (matchB ? parseInt(matchB[1]) : 0);
+});
+---
+
+<div class="carousel-wrapper" style="position: relative;">
+  <button id="scrollLeftBtn" title="scroll left" class="btn btn-secondary imageTrack__arrow" style="position: absolute; left: -15px; top: 50%; transform: translateY(-50%); z-index: 10; border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <i class="bi bi-chevron-left"></i>
+  </button>
+
+  <button id="scrollRightBtn" title="scroll right" class="btn btn-secondary imageTrack__arrow" style="position: absolute; right: -15px; top: 50%; transform: translateY(-50%); z-index: 10; border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <i class="bi bi-chevron-right"></i>
+  </button>
+
+  <div id="imageTrack" class="imageTrack">
+    <style>
+      #imageTrack::-webkit-scrollbar { display: none; }
+    </style>
+    {allImages.map((img) => (
+      <div class="imageTrack__imageContainer">
+        <Image
+          src={img}
+          width={img.width}
+          height={img.height}
+          alt="Event Image"
+          class="imageTrack__image"
+          data-bs-toggle="modal"
+          data-bs-target="#imageModal"
+          data-full={img.src}
+        />
+      </div>
+    ))}
+  </div>
+</div>
+<script is:inline>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Modal swap logic
+      var modalImage = document.getElementById('modalImage');
+      var imageElements = Array.from(document.querySelectorAll('#imageTrack img'));
+      var currentImageIndex = -1;
+
+      imageElements.forEach(function (image, index) {
+        image.addEventListener('click', function () {
+          currentImageIndex = index;
+          modalImage.src = image.getAttribute('data-full') || image.src;
+        });
+      });
+
+      function navigateImage(direction) {
+        if (currentImageIndex === -1) return;
+        if (direction === 'prev') {
+          currentImageIndex = (currentImageIndex - 1 + imageElements.length) % imageElements.length;
+        } else {
+          currentImageIndex = (currentImageIndex + 1) % imageElements.length;
+        }
+        var newImage = imageElements[currentImageIndex];
+        modalImage.src = newImage.getAttribute('data-full') || newImage.src;
+      }
+
+      // Modal keyboard navigation logic
+      document.addEventListener('keydown', function(event) {
+        // Find if modal is open (using Bootstrap 'show' class convention)
+        var modal = document.getElementById('imageModal');
+        if (modal && modal.classList.contains('show') && currentImageIndex !== -1) {
+          if (event.key === 'ArrowLeft') {
+            navigateImage('prev');
+          } else if (event.key === 'ArrowRight') {
+            navigateImage('next');
+          }
+        }
+      });
+
+      // Modal button navigation logic
+      var prevBtn = document.getElementById('modalPrevBtn');
+      var nextBtn = document.getElementById('modalNextBtn');
+      if (prevBtn) prevBtn.addEventListener('click', function() { navigateImage('prev'); });
+      if (nextBtn) nextBtn.addEventListener('click', function() { navigateImage('next'); });
+
+      // Carousel navigation logic
+      const track = document.getElementById('imageTrack');
+      const leftBtn = document.getElementById('scrollLeftBtn');
+      const rightBtn = document.getElementById('scrollRightBtn');
+
+      let timeoutId = null;
+      function checkScrollPosition(timeout = 350) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          if (track.scrollLeft === 0) {
+            leftBtn.setAttribute('disabled', 'true');
+          } else {
+            leftBtn.removeAttribute('disabled');
+          }
+          if (track.scrollWidth === track.scrollLeft + track.clientWidth) {
+            rightBtn.setAttribute('disabled', 'true');
+          } else {
+            rightBtn.removeAttribute('disabled');
+          }
+        }, timeout);
+      }
+
+      track.addEventListener('scroll', checkScrollPosition);
+
+      function calculateScrollAmount() {
+        const gap = 15; // Assuming a fixed gap between images
+        const images = Array.from(track.getElementsByTagName('img'));
+        const containerWidth = track.clientWidth;
+        let sum = 0;
+        for (const image of images) {
+          const remainingSpace = containerWidth - sum;
+          if (image.width > remainingSpace) {
+            break;
+          }
+          sum += image.width + gap;
+        }
+        return sum;
+      }
+
+      /**
+       * scrolls
+       * @param {'left'| 'right'} direction
+       */
+      function handleScroll(direction) {
+        const scrollAmount = direction === 'left' ? -calculateScrollAmount() : calculateScrollAmount();
+        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+
+      leftBtn.addEventListener('click', function() {
+        handleScroll('left');
+      });
+      rightBtn.addEventListener('click', function() {
+        handleScroll('right');
+      });
+
+      checkScrollPosition();
+    });
+</script>

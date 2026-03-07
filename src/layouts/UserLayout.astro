@@ -1,0 +1,80 @@
+---
+import Default from './Default.astro';
+import UserMenu from '../components/user/UserMenu.astro';
+import AuthGuard from '../components/auth/AuthGuard';
+
+
+interface Props {
+  title: string;
+  activeTab: 'profile' | 'api-keys';
+}
+
+const { title, activeTab } = Astro.props;
+---
+
+<Default title={title} activeId="user">
+  <div class="row mt-4 mt-lg-5">
+    <div class="col-12">
+      <div class="box p-4 mb-4">
+        <h1 class="mb-4">user settings;</h1>
+        <UserMenu activeTab={activeTab} />
+        <div class="user-content mt-4">
+          <AuthGuard client:load>
+            <slot />
+          </AuthGuard>
+        </div>
+      </div>
+    </div>
+  </div>
+</Default>
+
+<style is:global>
+  .custom-table {
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    background: transparent !important;
+    width: 100%;
+  }
+
+  .custom-table thead th {
+    border: none;
+    color: #b9bbbe !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    background: transparent !important;
+  }
+
+  .custom-table tbody tr {
+    background-color: #2b2d31 !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .custom-table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    background-color: #313338 !important;
+  }
+
+  .custom-table tbody td {
+    padding: 1rem;
+    border: none !important;
+    color: #dcddde !important;
+    vertical-align: middle;
+    background: transparent !important;
+  }
+
+  .custom-table tbody td:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    font-weight: 600;
+    color: #5865f2 !important;
+  }
+
+  .custom-table tbody td:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+</style>

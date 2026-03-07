@@ -1,0 +1,8 @@
+---
+import UserLayout from '../layouts/UserLayout.astro';
+import UserProfile from '../components/UserProfile.tsx';
+---
+
+<UserLayout title="My Profile" activeTab="profile">
+  <UserProfile client:load />
+</UserLayout>

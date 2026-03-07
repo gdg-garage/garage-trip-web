@@ -1,0 +1,9 @@
+---
+interface Props {
+  icon: string;
+}
+
+const { icon } = Astro.props;
+---
+
+<img width="24" height="24" src={`/assets/svg/icon/icon-${icon}.svg`} />

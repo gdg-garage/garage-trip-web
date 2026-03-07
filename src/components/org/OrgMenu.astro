@@ -1,0 +1,58 @@
+---
+interface Props {
+  activeTab: 'registrations' | 'achievements';
+}
+
+const { activeTab } = Astro.props;
+---
+
+<div class="org-menu mb-4">
+  <div class="d-flex gap-3">
+    <a 
+      href="/org" 
+      class:list={['org-menu-item', { active: activeTab === 'registrations' }]}
+    >
+      <i class="bi bi-people-fill me-2"></i>Registrations
+    </a>
+    <a 
+      href="/org/achievements" 
+      class:list={['org-menu-item', { active: activeTab === 'achievements' }]}
+    >
+      <i class="bi bi-trophy-fill me-2"></i>Achievements
+    </a>
+  </div>
+</div>
+
+<style>
+  .org-menu {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+  }
+
+  .org-menu-item {
+    color: #b9bbbe;
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+  }
+
+  .org-menu-item:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .org-menu-item.active {
+    color: #5865f2;
+    background-color: rgba(88, 101, 242, 0.1);
+  }
+
+  .org-menu-item i {
+    font-size: 1.1rem;
+  }
+</style>
