@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import TextScrambleAnimator from './TextScrambleAnimator';
+import './TextScramble.scss';
 
 interface Props {
   phrases: string[];
@@ -69,13 +70,14 @@ const TextScramble: React.FC<Props> = ({ phrases, elementId = 'subtitle-rotation
   }, [phrases]);
 
   return (
-    <em
-      id={elementId}
-      ref={elementRef}
-      style={{ minHeight: '1.5em', display: 'inline-block' }}
-    >
-      &nbsp;
-    </em>
+    <p className="text-scramble">
+      <em
+        id={elementId}
+        ref={elementRef}
+      >
+        &nbsp;
+      </em>
+    </p>
   );
 };
 
