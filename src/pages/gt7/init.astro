@@ -44,11 +44,11 @@ const wsUrlBase = PUBLIC_INIT_WS_URL;
 
         <div class="cipher-solve-container">
             <form id="cipher-form" class="cipher-form">
-                <input 
-                    type="text" 
-                    id="cipher-input" 
-                    class="cipher-input" 
-                    placeholder="Enter the code..." 
+                <input
+                    type="text"
+                    id="cipher-input"
+                    class="cipher-input"
+                    placeholder="Enter the code..."
                     required
                     autocomplete="off"
                 />
@@ -84,7 +84,7 @@ const wsUrlBase = PUBLIC_INIT_WS_URL;
         --glass: rgba(255, 255, 255, 0.05);
         --glass-border: rgba(255, 255, 255, 0.1);
 
-        min-height: 90vh;
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -433,7 +433,7 @@ const wsUrlBase = PUBLIC_INIT_WS_URL;
                     },
                     body: `email=${encodeURIComponent(email)}`,
                 });
-                
+
                 if (imgResponse.ok) {
                     const blob = await imgResponse.blob();
                     const url = URL.createObjectURL(blob);
@@ -456,7 +456,7 @@ const wsUrlBase = PUBLIC_INIT_WS_URL;
                     body: JSON.stringify({ code: code }),
                     credentials: 'include'
                 });
-                
+
                 if (response.status === 200) {
                     showNotification('Achievement granted! You solved it.', 'success');
                     cipherInput.value = '';
@@ -487,7 +487,7 @@ const wsUrlBase = PUBLIC_INIT_WS_URL;
                     body: JSON.stringify({ code: 'gt7init' }),
                     credentials: 'include'
                 });
-                
+
                 const data = await response.json();
                 console.log('Auto-grant achievement response:', data);
             } catch (error) {
