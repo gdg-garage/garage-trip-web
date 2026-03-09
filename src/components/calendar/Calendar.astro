@@ -91,6 +91,8 @@ for (let i = 0; i < DAYS_IN_WEEK_COUNT * 4; i++) {
 
 <style is:global>
   .calendar {
+    max-width: 392px;
+    margin: 0 auto;
     font-family: "JetBrains Mono", monospace;
   }
 
@@ -105,7 +107,7 @@ for (let i = 0; i < DAYS_IN_WEEK_COUNT * 4; i++) {
     color: var(--blue-help);
   }
   .calendar_header > div {
-    width: 32px;
+    width: auto;
     height: 32px;
     display: inline-flex;
     justify-content: center;
@@ -114,17 +116,18 @@ for (let i = 0; i < DAYS_IN_WEEK_COUNT * 4; i++) {
 
   .calendar_day_wrapper {
     position: relative;
-    width: 48px;
-    height: 48px;
+    width: auto;
+    height: 100%;
+    aspect-ratio: 1/1;
   }
 
   .calendar_day {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 16px;
+    width: 100%;
+    height: 100%;
+    border-radius: 33%;
     font-size: 1.25rem;
     font-weight: bold;
     line-height: 2;

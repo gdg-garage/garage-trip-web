@@ -276,6 +276,7 @@ a {
 }
 
 .container.main-container {
+    flex-grow: 1;
     @media (min-width: 1440px) {
         max-width: 1440px;
     }
@@ -295,7 +296,10 @@ a {
     color: $blue-help;
     font-size: 1rem;
     line-height: 1.5rem;
-    margin-top: 3rem;
+}
+
+.footer-container {
+  padding-top: 3rem;
 }
 
 .background-pattern {
