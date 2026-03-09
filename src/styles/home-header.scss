@@ -3,8 +3,14 @@
     &-header {
         font-size: 1.8rem;
         line-height: 2.5rem;
+        overflow: hidden;
+        word-break: break-word;
 
         @media #{$breakpoint-desktop} {
+            font-size: 2rem;
+        }
+
+        @media (min-width: 500px) {
             font-size: 2.5rem;
             line-height: 3.5rem;
         }
