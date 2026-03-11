@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
 import { PUBLIC_API_BASE_URL } from 'astro:env/client';
+import { getAchievementImageUrl } from '../utils/achievement';
 
 const EVENT_ID = 'g::t::7.0.0';
 
@@ -11,7 +12,7 @@ interface MeData {
 
 interface UserAchievement {
     name: string;
-    image: string;
+    image_data: string;
 }
 
 export default function UserProfile() {
@@ -166,14 +167,14 @@ export default function UserProfile() {
                                 <div className="d-flex flex-wrap gap-3">
                                     {achievements.map((a, i) => (
                                         <div key={i} className="text-center" style={{ width: '80px' }}>
-                                            {a.image ? (
+                                            {a.image_data ? (
                                                 <img 
-                                                    src={a.image.startsWith('http') ? a.image : `${PUBLIC_API_BASE_URL}/${a.image.replace(/^\//, '')}`} 
+                                                    src={getAchievementImageUrl(a.image_data)} 
                                                     alt={a.name} 
                                                     width="64" 
                                                     className="rounded mb-2 bg-dark mx-auto d-block cursor-pointer" 
                                                     style={{ cursor: 'pointer', height: 'auto', maxWidth: '64px' }}
-                                                    onClick={() => setSelectedImage(a.image.startsWith('http') ? a.image : `${PUBLIC_API_BASE_URL}/${a.image.replace(/^\//, '')}`)}
+                                                    onClick={() => setSelectedImage(getAchievementImageUrl(a.image_data))}
                                                 />
                                             ) : (
                                                 <div className="rounded-circle bg-secondary d-flex align-items-center justify-content-center mb-2 mx-auto" style={{ width: '64px', height: '64px' }}>

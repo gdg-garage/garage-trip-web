@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PUBLIC_API_BASE_URL } from 'astro:env/client';
+import { getAchievementImageUrl } from '../../utils/achievement';
 
 interface Achievement {
     name: string;
-    image: string;
+    image_data: string;
     discord_role_id: string;
 }
 
@@ -93,13 +94,13 @@ export default function OrgAchievementsList() {
                             {achievements.map((a) => (
                                 <tr key={a.id}>
                                     <td>
-                                        {a.image ? (
+                                        {a.image_data ? (
                                             <img 
-                                                src={a.image.startsWith('http') ? a.image : `${PUBLIC_API_BASE_URL}/${a.image.replace(/^\//, '')}`} 
+                                                src={getAchievementImageUrl(a.image_data)} 
                                                 alt={a.name} 
                                                 width="40" 
                                                 className="rounded bg-dark cursor-pointer" 
-                                                onClick={() => setSelectedImage(a.image.startsWith('http') ? a.image : `${PUBLIC_API_BASE_URL}/${a.image.replace(/^\//, '')}`)}
+                                                onClick={() => setSelectedImage(getAchievementImageUrl(a.image_data))}
                                                 style={{ cursor: 'pointer', height: 'auto', maxWidth: '40px' }}
                                             />
                                         ) : (
