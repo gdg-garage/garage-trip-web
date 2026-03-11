@@ -9,10 +9,17 @@ interface MeData {
     email?: string;
 }
 
+interface UserAchievement {
+    name: string;
+    image: string;
+}
+
 export default function UserProfile() {
     const [authState, setAuthState] = useState<'loading' | 'unauthorized' | 'authorized'>('loading');
     const [userData, setUserData] = useState<MeData | null>(null);
+    const [achievements, setAchievements] = useState<UserAchievement[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     const checkAuth = useCallback(async () => {
         try {
@@ -24,6 +31,20 @@ export default function UserProfile() {
             if (response.status === 200) {
                 const data: MeData = await response.json();
                 setUserData(data);
+
+                try {
+                    const achRes = await fetch(`${PUBLIC_API_BASE_URL}/me/achievements`, {
+                        headers: { Accept: 'application/json' },
+                        credentials: 'include',
+                    });
+                    if (achRes.ok) {
+                        const achData = await achRes.json();
+                        setAchievements(achData.achievements || []);
+                    }
+                } catch (e) {
+                    console.error('Failed to load achievements', e);
+                }
+
                 setAuthState('authorized');
             } else if (response.status === 401) {
                 setAuthState('unauthorized');
@@ -138,10 +159,58 @@ export default function UserProfile() {
                             <label className="text-secondary small text-uppercase fw-bold mb-1 d-block">Email</label>
                             <div className="fs-5 text-light">{userData?.email || 'not provided;'}</div>
                         </div>
+
+                        {achievements.length > 0 && (
+                            <div className="mt-5">
+                                <label className="text-secondary small text-uppercase fw-bold mb-3 d-block">Achievements</label>
+                                <div className="d-flex flex-wrap gap-3">
+                                    {achievements.map((a, i) => (
+                                        <div key={i} className="text-center" style={{ width: '80px' }}>
+                                            {a.image ? (
+                                                <img 
+                                                    src={a.image.startsWith('http') ? a.image : `${PUBLIC_API_BASE_URL}/${a.image.replace(/^\//, '')}`} 
+                                                    alt={a.name} 
+                                                    width="64" 
+                                                    className="rounded mb-2 bg-dark mx-auto d-block cursor-pointer" 
+                                                    style={{ cursor: 'pointer', height: 'auto', maxWidth: '64px' }}
+                                                    onClick={() => setSelectedImage(a.image.startsWith('http') ? a.image : `${PUBLIC_API_BASE_URL}/${a.image.replace(/^\//, '')}`)}
+                                                />
+                                            ) : (
+                                                <div className="rounded-circle bg-secondary d-flex align-items-center justify-content-center mb-2 mx-auto" style={{ width: '64px', height: '64px' }}>
+                                                    <i className="bi bi-trophy fs-3 text-light"></i>
+                                                </div>
+                                            )}
+                                            <div className="small fw-bold text-light text-wrap mx-auto" style={{ wordBreak: 'break-word', lineHeight: '1.2' }}>{a.name}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                 </div>
             </div>
+
+            {/* Image Modal */}
+            {selectedImage && (
+                <div 
+                    className="modal show d-block" 
+                    tabIndex={-1} 
+                    style={{ backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 1050 }}
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content bg-transparent border-0">
+                            <div className="modal-body text-center p-0">
+                                <img src={selectedImage} alt="Large achievement" className="img-fluid rounded shadow-lg" style={{ maxHeight: '80vh' }} />
+                                <button className="btn btn-sm btn-light mt-3 position-absolute top-0 end-0 m-3" onClick={() => setSelectedImage(null)}>
+                                    <i className="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
