@@ -6,7 +6,7 @@
         overflow: hidden;
         word-break: break-word;
 
-        @media #{$breakpoint-desktop} {
+        @include media-breakpoint-up(sm) {
             font-size: 2rem;
         }
 
@@ -23,7 +23,7 @@
         flex-wrap: wrap;
         margin-top: 3rem;
 
-        @media #{$breakpoint-desktop} {
+        @include media-breakpoint-up(sm) {
             gap: 2rem;
         }
 

@@ -1,0 +1,154 @@
+.box {
+    display: flex;
+    flex-direction: column;
+    background-color: $blue-dark;
+    border-radius: $radius;
+    padding: 1.5rem 1rem 1rem;
+
+    table {
+        width: 100%;
+        margin: 0.8em 0;
+
+        td {
+            padding: 0.4em;
+            border: 1px solid #515151;
+        }
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        line-height: 2rem;
+        margin-bottom: 2.125rem;
+
+        font-weight: bold;
+
+        &::after {
+            content: " ";
+            display: block;
+            width: 8rem;
+            height: 0.125rem;
+            margin: 0.5rem 0;
+            position: absolute;
+            background-color: $purple;
+        }
+    }
+
+    p {
+        font-size: 1rem;
+        line-height: 1.5rem;
+
+        font-weight: bold;
+
+        color: $blue-light;
+    }
+
+    p.subtitle {
+        margin-bottom: 1.5rem;
+    }
+
+    &:not(.info-box) {
+      ul {
+        padding-left: 1.25rem;
+
+        ::marker {
+          color: $primary;
+          font-size: 1.25rem;
+          line-height: 1.2;
+        }
+      }
+    }
+
+    @include media-breakpoint-up(sm) {
+      padding: 2.5rem 2rem 2rem;
+
+      h3 {
+          font-size: 2rem;
+          line-height: 3rem;
+          margin-bottom: 2.625rem;
+      }
+
+      p {
+          font-size: 1.125rem;
+          line-height: 2rem;
+      }
+
+      p.subtitle {
+          font-size: 1.25rem;
+          line-height: 2rem;
+      }
+    }
+}
+
+.info-box {
+    min-height: 343px;
+    height: 343px;
+    overflow: hidden;
+    position: relative;
+
+    h3 {
+        margin-bottom: 1.625rem;
+
+        &::after {
+            background-color: $blue;
+        }
+    }
+
+    &-inner {
+        flex-grow: 1;
+        position: relative;
+
+        &-footer {
+            display: flex;
+            width: 100%;
+            gap: 1rem;
+            // positioning
+            position: absolute;
+            bottom: 0;
+            flex-wrap: wrap;
+        }
+
+    }
+
+    &-bg {
+        position: absolute;
+        width: calc(100% - 2rem);
+        height: auto;
+
+        &.illu-calendar,
+        &.illu-location {
+            top: 122px;
+            left: 1rem;
+        }
+
+        &.illu-sauna {
+            width: auto;
+            height: 192px;
+            top: 96px;
+            right: 0;
+        }
+    }
+
+    @include media-breakpoint-up(sm) {
+        min-height: 448px;
+        height: 448px;
+
+        h3 {
+            margin-bottom: 2.625rem;
+        }
+
+        &-bg {
+            width: calc(100% - 4rem);
+
+            &.illu-calendar,
+            &.illu-location {
+                top: 186px;
+                left: 2rem;
+            }
+
+            &.illu-sauna {
+                height: 256px;
+                top: 136px;
+            }
+        }
+    }
+}

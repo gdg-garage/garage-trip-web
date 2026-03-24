@@ -89,7 +89,7 @@ for (let i = 0; i < DAYS_IN_WEEK_COUNT * 4; i++) {
   </div>
 </div>
 
-<style is:global>
+<style>
   .calendar {
     max-width: 342px;
     margin: 0 auto;
@@ -98,8 +98,8 @@ for (let i = 0; i < DAYS_IN_WEEK_COUNT * 4; i++) {
 
   .calendar_header {
     display: flex;
-    padding: 0 8px;
-    gap: 8px;
+    padding: 0 0.5rem;
+    gap: 0.5rem;
     justify-content: space-between;
 
     font-weight: bold;
@@ -108,7 +108,7 @@ for (let i = 0; i < DAYS_IN_WEEK_COUNT * 4; i++) {
   }
   .calendar_header > div {
     width: auto;
-    height: 32px;
+    height: 2rem;
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -158,10 +158,10 @@ for (let i = 0; i < DAYS_IN_WEEK_COUNT * 4; i++) {
   .calendar_grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+    gap: 0.5rem;
   }
   .calendar_grid--masked {
-    margin-top: 8px;
+    margin-top: 0.5rem;
     mask-image: linear-gradient(#22282FAA, #1B1E2200);
   }
 </style>

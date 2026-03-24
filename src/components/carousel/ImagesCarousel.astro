@@ -1,9 +1,11 @@
 ---
-import './ImagesCarousel.scss';
+import css from './ImagesCarousel.module.scss';
 import { Image } from 'astro:assets';
+import ArrowButton from './ArrowButton.astro';
 
 const mainImages = Object.values(import.meta.glob('/src/assets/images/g::t::7.0.0/*.{jpg,png}', { eager: true }));
-const allImages = mainImages.map((mod: any) => mod.default) as ImageMetadata[];
+// TODO: remove
+const allImages = mainImages.map((mod: any) => mod.default).slice(0, 5) as ImageMetadata[];
 allImages.sort((a, b) => {
   const matchA = a.src.match(/hp_(\d+)/);
   const matchB = b.src.match(/hp_(\d+)/);
@@ -11,27 +13,19 @@ allImages.sort((a, b) => {
 });
 ---
 
-<div class="carousel-wrapper" style="position: relative;">
-  <button id="scrollLeftBtn" title="scroll left" class="btn btn-secondary imageTrack__arrow" style="position: absolute; left: -15px; top: 50%; transform: translateY(-50%); z-index: 10; border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-    <i class="bi bi-chevron-left"></i>
-  </button>
+<div class={css.carouselWrapper}>
+  <ArrowButton id="scrollLeftBtn" title="scroll left" direction="left" className={css.imageTrack__arrowLeft}/>
+  <ArrowButton id="scrollRightBtn" title="scroll right" direction="right" className={css.imageTrack__arrowRight} />
 
-  <button id="scrollRightBtn" title="scroll right" class="btn btn-secondary imageTrack__arrow" style="position: absolute; right: -15px; top: 50%; transform: translateY(-50%); z-index: 10; border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-    <i class="bi bi-chevron-right"></i>
-  </button>
-
-  <div id="imageTrack" class="imageTrack">
-    <style>
-      #imageTrack::-webkit-scrollbar { display: none; }
-    </style>
+  <div id="imageTrack" class={css.imageTrack}>
     {allImages.map((img) => (
-      <div class="imageTrack__imageContainer">
+      <div class={css.imageTrack__imageContainer}>
         <Image
           src={img}
           width={img.width}
           height={img.height}
           alt="Event Image"
-          class="imageTrack__image"
+          class={css.imageTrack__image}
           data-bs-toggle="modal"
           data-bs-target="#imageModal"
           data-full={img.src}
@@ -40,12 +34,36 @@ allImages.sort((a, b) => {
     ))}
   </div>
 </div>
+
+<div
+    class="modal fade"
+    id="imageModal"
+    tabindex="-1"
+    aria-labelledby="imageModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body position-relative p-0">
+          <ArrowButton id="modalPrevBtn" title="Previous image" direction="left" variant="modal" className={css.modalBtn__prev} />
+          <img src="" id="modalImage" class="img-fluid" />
+          <ArrowButton id="modalNextBtn" title="Next image" direction="right" variant="modal" className={css.modalBtn__next} />
+        </div>
+      </div>
+    </div>
+</div>
+
 <script is:inline>
     document.addEventListener('DOMContentLoaded', function () {
+      const track = document.getElementById('imageTrack');
+      if (!track) {
+        console.error('Missing image track element');
+        return;
+      }
       // Modal swap logic
-      var modalImage = document.getElementById('modalImage');
-      var imageElements = Array.from(document.querySelectorAll('#imageTrack img'));
-      var currentImageIndex = -1;
+      const modalImage = document.getElementById('modalImage');
+      const imageElements = Array.from(track.getElementsByTagName('img'));
+      let currentImageIndex = -1;
 
       imageElements.forEach(function (image, index) {
         image.addEventListener('click', function () {
@@ -61,14 +79,14 @@ allImages.sort((a, b) => {
         } else {
           currentImageIndex = (currentImageIndex + 1) % imageElements.length;
         }
-        var newImage = imageElements[currentImageIndex];
+        const newImage = imageElements[currentImageIndex];
         modalImage.src = newImage.getAttribute('data-full') || newImage.src;
       }
 
       // Modal keyboard navigation logic
       document.addEventListener('keydown', function(event) {
         // Find if modal is open (using Bootstrap 'show' class convention)
-        var modal = document.getElementById('imageModal');
+        const modal = document.getElementById('imageModal');
         if (modal && modal.classList.contains('show') && currentImageIndex !== -1) {
           if (event.key === 'ArrowLeft') {
             navigateImage('prev');
@@ -79,13 +97,13 @@ allImages.sort((a, b) => {
       });
 
       // Modal button navigation logic
-      var prevBtn = document.getElementById('modalPrevBtn');
-      var nextBtn = document.getElementById('modalNextBtn');
+      const prevBtn = document.getElementById('modalPrevBtn');
+      const nextBtn = document.getElementById('modalNextBtn');
       if (prevBtn) prevBtn.addEventListener('click', function() { navigateImage('prev'); });
       if (nextBtn) nextBtn.addEventListener('click', function() { navigateImage('next'); });
 
       // Carousel navigation logic
-      const track = document.getElementById('imageTrack');
+
       const leftBtn = document.getElementById('scrollLeftBtn');
       const rightBtn = document.getElementById('scrollRightBtn');
 
@@ -129,7 +147,7 @@ allImages.sort((a, b) => {
        */
       function handleScroll(direction) {
         const scrollAmount = direction === 'left' ? -calculateScrollAmount() : calculateScrollAmount();
-        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        track.scrollTo({ left: track.scrollLeft + scrollAmount, behavior: 'smooth' });
       }
 
       leftBtn.addEventListener('click', function() {

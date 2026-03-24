@@ -1,0 +1,18 @@
+---
+import clsx from 'clsx';
+import css from './ArrowButton.module.scss';
+
+type Props = {
+  id: string;
+  direction: 'left' | 'right'
+  title?: string;
+  className?: string;
+  variant?: 'default' | 'modal';
+}
+
+const { id, direction, title, className, variant = 'default' } = Astro.props;
+---
+
+<button id={id} title={title} aria-label={title} class={clsx(variant === 'modal' ? css.modal : 'btn btn-secondary', css.arrowButton, className)}>
+  <i class:list={['bi', { 'bi-chevron-left': direction === 'left', 'bi-chevron-right': direction === 'right', }]}></i>
+</button>

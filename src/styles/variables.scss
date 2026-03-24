@@ -1,3 +1,5 @@
+@use 'colors.scss';
+
 $background: var(--blue-bg);
 $text: var(--blue-light);
 $purple: var(--purple);
@@ -13,7 +15,6 @@ $header-container-padding-h: 1.5rem;
 
 
 $radius: 2rem;
-$breakpoint-desktop: '(min-width: 380px)';
 
 @mixin main-font {
 	font-family: "JetBrains Mono", monospace;
@@ -23,13 +24,13 @@ $breakpoint-desktop: '(min-width: 380px)';
 }
 
 :root {
-	--white: #{$c-white};
-	--blue-dark: #{$c-blue-dark};
-	--blue-bg: #{$c-blue-bg};
-	--blue-help: #{$c-blue-help};
-	--blue-light: #{$c-blue-light};
-	--blue-discord: #{$c-blue-discord};
-	--purple: #{$c-purple};
-	--yellow: #{$c-yellow};
-	--gray-text: #{$c-text-gray};
+	--white: #{colors.$c-white};
+	--blue-dark: #{colors.$c-blue-dark};
+	--blue-bg: #{colors.$c-blue-bg};
+	--blue-help: #{colors.$c-blue-help};
+	--blue-light: #{colors.$c-blue-light};
+	--blue-discord: #{colors.$c-blue-discord};
+	--purple: #{colors.$c-purple};
+	--yellow: #{colors.$c-yellow};
+	--gray-text: #{colors.$c-text-gray};
 }

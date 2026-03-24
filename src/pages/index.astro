@@ -4,6 +4,7 @@ import ButtonLink from '../components/ButtonLink.astro';
 import TextScramble from '../components/TextScramble/TextScramble';
 import ImagesCarousel from '@/components/carousel/ImagesCarousel.astro';
 import Calendar from '@/components/calendar/Calendar.astro';
+import CommentBox from '@/components/CommentBox.astro';
 
 const phrases = [
   'Licensed to Code.',
@@ -131,7 +132,7 @@ const phrases = [
         <ul>
           <li>
             <strong>Major version update</strong>: from <a href="/history" target="_blank">six</a>{' '}
-            to seven ... 6🤷7
+            to seven ... 6&nbsp;🤷&nbsp;7
           </li>
           <li>
             <strong>Legacy Support</strong>: All your favorite friends and puzzles remain fully
@@ -154,13 +155,13 @@ const phrases = [
         <h3>feedback;</h3>
         <div class="row gy-3">
           <div class="col-lg-4">
-            <div class="comment-box p-3"><em>Nerdvana.</em></div>
+            <CommentBox>Nerdvana.</CommentBox>
           </div>
           <div class="col-lg-4">
-            <div class="comment-box p-3"><em>The highlight of the year.</em></div>
+            <CommentBox>The highlight of the year.</CommentBox>
           </div>
           <div class="col-lg-4">
-            <div class="comment-box p-3"><em>Never attended an event like this before.</em></div>
+            <CommentBox>Never attended an event like this before.</CommentBox>
           </div>
         </div>
       </div>
@@ -169,7 +170,7 @@ const phrases = [
 
   <div class="row mb-4">
     <div class="col">
-      <div class="box images position-relative">
+      <div class="box">
         <h3>images;</h3>
         <ImagesCarousel />
       </div>
@@ -247,25 +248,5 @@ const phrases = [
     <a href="https://mastodon.social/@garagetrip"><i class="bi bi-mastodon"></i></a>
   </div>
 
-  <div
-    class="modal fade"
-    id="imageModal"
-    tabindex="-1"
-    aria-labelledby="imageModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-body position-relative p-0">
-          <button id="modalPrevBtn" class="modal-nav-btn modal-nav-btn--prev" aria-label="Previous image">
-            <i class="bi bi-chevron-left"></i>
-          </button>
-          <img src="" id="modalImage" class="img-fluid" />
-          <button id="modalNextBtn" class="modal-nav-btn modal-nav-btn--next" aria-label="Next image">
-            <i class="bi bi-chevron-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+
 </Default>

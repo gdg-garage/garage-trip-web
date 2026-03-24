@@ -1,0 +1,40 @@
+.arrowButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+
+  font-size: medium;
+
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  transition: opacity 0.3s ease;
+}
+
+.arrowButton[disabled] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.arrowButton.modal {
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  border: none;
+  font-size: large;
+  transition: background 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.7);
+    color: var(--secondary-color);
+  }
+
+  @media (min-width: 768px) {
+      font-size: 1.5rem;
+      width: 3rem;
+      height: 3rem;
+  }
+}
