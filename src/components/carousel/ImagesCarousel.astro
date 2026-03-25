@@ -4,8 +4,7 @@ import { Image } from 'astro:assets';
 import ArrowButton from './ArrowButton.astro';
 
 const mainImages = Object.values(import.meta.glob('/src/assets/images/g::t::7.0.0/*.{jpg,png}', { eager: true }));
-// TODO: remove
-const allImages = mainImages.map((mod: any) => mod.default).slice(0, 5) as ImageMetadata[];
+const allImages = mainImages.map((mod: any) => mod.default) as ImageMetadata[];
 allImages.sort((a, b) => {
   const matchA = a.src.match(/hp_(\d+)/);
   const matchB = b.src.match(/hp_(\d+)/);
