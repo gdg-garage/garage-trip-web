@@ -2,24 +2,35 @@
 import Default from '../layouts/Default.astro';
 import { Image } from 'astro:assets';
 import qrPayment from '../assets/images/qr_payment.png';
+import GarageTripText from '../components/GarageTripText';
 ---
 
 <Default title="Payment" activeId="payment">
   <div class="row mt-4">
-    <div class="col-lg-8 offset-lg-2">
+    <div class="col-lg-10 offset-lg-1">
       <div class="box">
         <h3>payment information;</h3>
         <p>
-          To finalize your registration for <strong>garage::trip::7.0.0</strong>, a registration fee
+          To finalize your registration for <strong><GarageTripText suffixes={['7.0.0']} /></strong>, a registration fee
           is required.
         </p>
 
-        <div class="payment-details mt-4 p-4 border border-secondary rounded bg-dark">
+        <div class="payment-details mt-4 p-4 px-2 px-sm-4 border border-secondary rounded bg-dark">
           <div class="row align-items-center gy-4">
-            <div class="col-md-7">
-              <h4 class="text-white mb-3">registration fee: <span class="secondary-color">3000 CZK</span></h4>
+            <div class="col-md-8 col-xl-7">
+              <h4 class="text-white text-center text-sm-start lh-base mb-3">registration fee: <span class="secondary-color">3000&nbsp;CZK</span></h4>
               <p class="mb-2 text-secondary">Please send the payment to the following account:</p>
-              <div class="table-responsive">
+              <div class="container d-md-none">
+                <div class="row">
+                  <div class="col-12 border text-secondary small py-1 align-middle"><strong>Account Number:</strong></div>
+                  <div class="col-12 border fs-4 fw-bold monospace text-white py-1">7289978676/5500</div>
+                </div>
+                <div class="row">
+                  <div class="col-12 border text-secondary small py-1 align-middle"><strong>Note for recipient:</strong></div>
+                  <div class="col-12 border fs-5 fw-bold monospace text-white py-1">[Your email address]</div>
+                </div>
+              </div>
+              <div class="table-responsive d-none d-md-block">
                 <table class="table table-borderless align-middle mb-0">
                   <tbody>
                     <tr>
@@ -34,8 +45,8 @@ import qrPayment from '../assets/images/qr_payment.png';
                 </table>
               </div>
             </div>
-            <div class="col-md-5 text-center">
-              <Image src={qrPayment} alt="QR Payment" class="img-fluid rounded border border-secondary bg-white p-2" width={250} />
+            <div class="col-md-4 col-xl-5 text-center">
+              <Image src={qrPayment} alt="QR Payment" class="img-fluid rounded border border-secondary bg-white p-lg-2" width={250} />
             </div>
           </div>
           <p class="mt-4 mb-0" style="font-size: 0.75rem; color: #6c757d; font-style: italic;">
@@ -47,8 +58,8 @@ import qrPayment from '../assets/images/qr_payment.png';
           <div class="alert alert-secondary bg-dark border-secondary text-secondary p-4">
             <h5 class="alert-heading fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>manual processing</h5>
             <p class="mb-0 text-info">
-              Please note that all payments are <strong>processed manually</strong> by our team. 
-              As such, please <strong>expect delays</strong> of several days before your payment is reflected in the system. 
+              Please note that all payments are <strong>processed manually</strong> by our team.
+              As such, please <strong>expect delays</strong> of several days before your payment is reflected in the system.
               Human errors can occur; if your payment isn't confirmed within a week, please reach out to us.
             </p>
           </div>
@@ -57,7 +68,7 @@ import qrPayment from '../assets/images/qr_payment.png';
         <div class="mt-5">
           <h4 class="mb-3">all-inclusive;</h4>
           <p class="text-secondary small mb-3">
-            The event is <strong>completely all-inclusive</strong>. We have decided not to track individual consumption for financial purposes during the event. 
+            The event is <strong>completely all-inclusive</strong>. We have decided not to track individual consumption for financial purposes during the event.
           </p>
           <p class="text-secondary small mb-3">
             In the past, tracking and backtracking consumption was quite complicated, and we found that the final price difference for individuals wasn't significant enough to justify the extra effort. Our primary goal is for everyone to <strong>simply enjoy the event</strong> however they see fit.
@@ -73,16 +84,16 @@ import qrPayment from '../assets/images/qr_payment.png';
         <div class="mt-5">
           <h4 class="mb-3">price calculation;</h4>
           <p class="text-secondary small mb-3">
-            Our pricing is designed to be fair and transparent, distributing the total event costs 
-            among all participants. We use an exponential model (exponent 0.6) to calculate individual 
+            Our pricing is designed to be fair and transparent, distributing the total event costs
+            among all participants. We use an exponential model (exponent 0.6) to calculate individual
             fees based on the duration of your stay:
           </p>
           <div class="p-3 bg-dark border border-secondary rounded monospace mb-3 text-center">
             <span class="fs-4 text-white">Price = (Nights<sup>0.6</sup>) &times; Unit_Coefficient</span>
           </div>
           <p class="text-secondary small">
-            This "Fair Split" model ensures that while those staying longer contribute more, 
-             the <strong>effective price per night decreases</strong> the longer you stay. 
+            This "Fair Split" model ensures that while those staying longer contribute more,
+             the <strong>effective price per night decreases</strong> the longer you stay.
             This makes it more affordable for everyone to join for the full duration of the event.
           </p>
         </div>

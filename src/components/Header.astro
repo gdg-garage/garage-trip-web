@@ -1,5 +1,6 @@
 ---
 import ButtonLink from './ButtonLink.astro';
+import GarageTripText from './GarageTripText';
 import UserHeaderLink from './UserHeaderLink.tsx';
 
 interface Props {
@@ -23,7 +24,7 @@ const { activeId } = Astro.props;
       <span class="navbar-toggler-icon"></span>
     </button>
     <a class="logo header-item" href="/" title="Garage Trip">
-      garage::<span class="secondary-color">trip</span>
+      <GarageTripText />
     </a>
     <div class="menu">
       <div class="menu-container-desktop">
