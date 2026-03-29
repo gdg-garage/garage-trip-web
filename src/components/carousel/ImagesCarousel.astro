@@ -106,56 +106,161 @@ allImages.sort((a, b) => {
       const leftBtn = document.getElementById('scrollLeftBtn');
       const rightBtn = document.getElementById('scrollRightBtn');
 
-      let timeoutId = null;
-      function checkScrollPosition(timeout = 350) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          if (track.scrollLeft === 0) {
-            leftBtn.setAttribute('disabled', 'true');
-          } else {
-            leftBtn.removeAttribute('disabled');
-          }
-          if (track.scrollWidth === track.scrollLeft + track.clientWidth) {
-            rightBtn.setAttribute('disabled', 'true');
-          } else {
-            rightBtn.removeAttribute('disabled');
-          }
-        }, timeout);
+
+      function updateButtonStates() {
+        if (track.scrollLeft === 0) {
+          leftBtn.setAttribute('disabled', 'true');
+        } else {
+          leftBtn.removeAttribute('disabled');
+        }
+        if (track.scrollWidth === track.scrollLeft + track.clientWidth) {
+          rightBtn.setAttribute('disabled', 'true');
+        } else {
+          rightBtn.removeAttribute('disabled');
+        }
       }
 
-      track.addEventListener('scroll', checkScrollPosition);
+      const state = {
+        targetScroll: 0,
+      }
+      let isScrolling = false;
 
-      function calculateScrollAmount() {
+      function handleScroll() {
+        // console.log('STATE', track.scrollLeft, state.targetScroll, isScrolling)
+        if (isScrolling && track.scrollLeft !== state.targetScroll) {
+          return;
+        }
+        isScrolling = false;
+
+        // handle all stuff
+        updateButtonStates();
+      }
+
+      let isThrottling = false;
+
+      function onScroll() {
+        if (isThrottling) { return; }
+        isThrottling = true;
+
+        requestAnimationFrame(() => {
+          isThrottling = false;
+          handleScroll();
+        });
+      }
+
+      track.addEventListener('scroll', onScroll);
+
+      function calculateNextScrollPosition(direction) {
         const gap = 15; // Assuming a fixed gap between images
         const images = Array.from(track.getElementsByTagName('img'));
         const containerWidth = track.clientWidth;
+        const currentScrollLeft = track.scrollLeft;
+
+        // GOING RIGHT
+        if (direction === 'right') {
+          const targetMaxPosition = currentScrollLeft + containerWidth
+          let sum = 0;
+          let searchedPosition = 0;
+          let searchedImage = images[0];
+
+          for (const image of images) {
+            const remainingSpace = targetMaxPosition - sum;
+            if (image.width > remainingSpace) {
+              searchedImage = image;
+              searchedPosition = sum;
+              break;
+            }
+
+            sum += image.width + gap;
+
+            if (targetMaxPosition - sum <= 0) {
+              searchedImage = image;
+              searchedPosition = sum;
+              break;
+            }
+          }
+          const searchedIndex = images.indexOf(searchedImage);
+
+          let sumOfOccupiedSpace = searchedImage.width;
+          for (let i = searchedIndex + 1; i < images.length; i++) {
+            const remainingSpace = containerWidth - sumOfOccupiedSpace;
+            if (remainingSpace < images[i].width) {
+              break;
+            }
+            sumOfOccupiedSpace += gap + images[i].width;
+          }
+
+          return {
+            left: searchedPosition,
+            occupiedSpace: sumOfOccupiedSpace,
+            remainingSpace: containerWidth - sumOfOccupiedSpace,
+          };
+        }
+        // GOING LEFT
+        const targetMaxPosition = currentScrollLeft;
         let sum = 0;
+        let searchedPosition = 0;
+        let searchedImage = images[0];
         for (const image of images) {
-          const remainingSpace = containerWidth - sum;
-          if (image.width > remainingSpace) {
+          const remainingSpace = targetMaxPosition - sum;
+          if (remainingSpace <= 0) {
             break;
           }
           sum += image.width + gap;
+          searchedImage = image;
+          searchedPosition = sum - gap;
         }
-        return sum;
+
+        const searchedIndex = images.indexOf(searchedImage);
+
+        let sumOfOccupiedSpace = searchedImage.width;
+        for (let i = searchedIndex - 1; i >= 0; i--) {
+          const remainingSpace = containerWidth - sumOfOccupiedSpace;
+          if (remainingSpace < images[i].width) {
+            break;
+          }
+          sumOfOccupiedSpace += gap + images[i].width;
+        }
+
+        return {
+          left: searchedPosition - containerWidth,
+          occupiedSpace: sumOfOccupiedSpace,
+          remainingSpace: containerWidth - sumOfOccupiedSpace,
+        };
       }
 
-      /**
-       * scrolls
-       * @param {'left'| 'right'} direction
-       */
-      function handleScroll(direction) {
-        const scrollAmount = direction === 'left' ? -calculateScrollAmount() : calculateScrollAmount();
-        track.scrollTo({ left: track.scrollLeft + scrollAmount, behavior: 'smooth' });
+      function requestScroll(direction) {
+        if (isScrolling) { return; }
+        const maxLeftPosition = track.scrollWidth - track.clientWidth;
+        const {
+          left: scrollLeft,
+          remainingSpace,
+        } = calculateNextScrollPosition(direction);
+
+        let targetScroll = Math.max(0, Math.min(scrollLeft, maxLeftPosition));
+
+        // correction
+        if (targetScroll !== 0 && targetScroll !== maxLeftPosition && remainingSpace >= 2) {
+          targetScroll = direction === 'left'
+            ? targetScroll + Math.floor(remainingSpace / 2)
+            : targetScroll - Math.floor(remainingSpace / 2)
+        }
+
+        state.targetScroll = targetScroll;
+
+        if (state.targetScroll !== track.scrollLeft) {
+          isScrolling = true;
+          track.scrollTo({ left: targetScroll, behavior: 'smooth' });
+        }
       }
 
       leftBtn.addEventListener('click', function() {
-        handleScroll('left');
+        requestScroll('left');
       });
       rightBtn.addEventListener('click', function() {
-        handleScroll('right');
+        requestScroll('right');
       });
 
-      checkScrollPosition();
+      updateButtonStates();
     });
 </script>
