@@ -21,8 +21,8 @@ const INITIAL_PARTICIPANTS: Participant[] = [
 
 export default function PaymentSimulation() {
   const [participants, setParticipants] = useState(INITIAL_PARTICIPANTS);
-  const [accommodationCost, setAccommodationCost] = useState(100000);
-  const [otherCost, setOtherCost] = useState(50000);
+  const [accommodationCost, setAccommodationCost] = useState(70000);
+  const [otherCost, setOtherCost] = useState(30000);
 
   const totalCost = accommodationCost + otherCost;
 
@@ -36,28 +36,43 @@ export default function PaymentSimulation() {
     setParticipants(pts => pts.map(p => p.id === id ? { ...p, nights: Math.max(0, nights) } : p));
   };
 
+  const handleNameChange = (id: number, name: string) => {
+    setParticipants(pts => pts.map(p => p.id === id ? { ...p, name } : p));
+  };
+
+  const handleAddParticipant = () => {
+    setParticipants(pts => {
+      const nextId = pts.length > 0 ? Math.max(...pts.map(p => p.id)) + 1 : 1;
+      return [...pts, { id: nextId, name: 'New Attendee', nights: 7 }];
+    });
+  };
+
+  const handleRemoveParticipant = (id: number) => {
+    setParticipants(pts => pts.filter(p => p.id !== id));
+  };
+
   return (
     <div className="payment-simulation mt-4 p-4 border border-secondary rounded bg-dark">
       <h5 className="mb-3 text-white"><i className="bi bi-calculator me-2"></i>Interactive Fair Split Simulation</h5>
       <div className="row mb-4">
         <div className="col-md-6 mb-3">
           <label className="form-label text-secondary small">Accommodation Cost (CZK)</label>
-          <input 
-            type="number" 
-            className="form-control bg-dark text-white border-secondary" 
-            value={accommodationCost} 
-            onChange={e => setAccommodationCost(Number(e.target.value))} 
+          <input
+            type="number"
+            className="form-control bg-dark text-white border-secondary"
+            value={accommodationCost}
+            onChange={e => setAccommodationCost(Number(e.target.value))}
             min="0"
             step="1000"
           />
         </div>
         <div className="col-md-6 mb-3">
           <label className="form-label text-secondary small">Other Costs (Food, Drinks, etc.)</label>
-          <input 
-            type="number" 
-            className="form-control bg-dark text-white border-secondary" 
-            value={otherCost} 
-            onChange={e => setOtherCost(Number(e.target.value))} 
+          <input
+            type="number"
+            className="form-control bg-dark text-white border-secondary"
+            value={otherCost}
+            onChange={e => setOtherCost(Number(e.target.value))}
             min="0"
             step="1000"
           />
@@ -69,6 +84,12 @@ export default function PaymentSimulation() {
           </div>
         </div>
       </div>
+
+      <div className="d-flex justify-content-end mb-2">
+        <button className="btn btn-sm btn-outline-info" onClick={handleAddParticipant}>
+          <i className="bi bi-person-plus me-1"></i> Add Attendee
+        </button>
+      </div>
       
       <div className="table-responsive">
         <table className="table custom-table table-dark table-hover mb-0">
@@ -79,6 +100,7 @@ export default function PaymentSimulation() {
               <th className="text-secondary text-end">Coef. (Nights<sup>0.6</sup>)</th>
               <th className="text-secondary text-end">Total Price</th>
               <th className="text-secondary text-end">Per Night</th>
+              <th className="text-secondary text-center"></th>
             </tr>
           </thead>
           <tbody>
@@ -88,13 +110,21 @@ export default function PaymentSimulation() {
               const pricePerNight = p.nights > 0 ? price / p.nights : 0;
               return (
                 <tr key={p.id}>
-                  <td className="align-middle text-white">{p.name}</td>
                   <td className="align-middle">
-                    <input 
-                      type="number" 
-                      className="form-control form-control-sm bg-dark text-white border-secondary" 
-                      style={{maxWidth: '80px'}} 
-                      value={p.nights} 
+                    <input
+                      type="text"
+                      className="form-control form-control-sm bg-dark text-white border-secondary"
+                      style={{ minWidth: '150px' }}
+                      value={p.name}
+                      onChange={e => handleNameChange(p.id, e.target.value)}
+                    />
+                  </td>
+                  <td className="align-middle">
+                    <input
+                      type="number"
+                      className="form-control form-control-sm bg-dark text-white border-secondary"
+                      style={{ maxWidth: '80px' }}
+                      value={p.nights}
                       onChange={e => handleNightsChange(p.id, Number(e.target.value))}
                       min="0"
                       max="14"
@@ -103,6 +133,11 @@ export default function PaymentSimulation() {
                   <td className="align-middle text-end text-secondary">{coef.toFixed(3)}</td>
                   <td className="align-middle text-end fw-bold" style={{ color: '#ae91ff' }}>{Math.round(price).toLocaleString()} CZK</td>
                   <td className="align-middle text-end text-secondary">{Math.round(pricePerNight).toLocaleString()} CZK</td>
+                  <td className="align-middle text-center">
+                    <button className="btn btn-sm btn-outline-danger border-0" onClick={() => handleRemoveParticipant(p.id)} title="Remove">
+                      <i className="bi bi-trash"></i>
+                    </button>
+                  </td>
                 </tr>
               );
             })}
