@@ -3,6 +3,7 @@ import Default from '../layouts/Default.astro';
 import { Image } from 'astro:assets';
 import qrPayment from '../assets/images/qr_payment.png';
 import GarageTripText from '../components/GarageTripText';
+import PaymentSimulation from '../components/PaymentSimulation';
 ---
 
 <Default title="Payment" activeId="payment">
@@ -96,6 +97,7 @@ import GarageTripText from '../components/GarageTripText';
              the <strong>effective price per night decreases</strong> the longer you stay.
             This makes it more affordable for everyone to join for the full duration of the event.
           </p>
+          <PaymentSimulation client:load />
         </div>
 
         <div class="mt-5">
