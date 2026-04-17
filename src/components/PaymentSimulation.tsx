@@ -80,6 +80,7 @@ export default function PaymentSimulation() {
         <div className="col-12 mt-2">
           <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center p-3 text-white border border-secondary rounded" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
             <span className="mb-2 mb-sm-0"><strong>Total Event Cost:</strong> <span className="fs-5 text-white ms-2">{totalCost.toLocaleString()} CZK</span></span>
+            <span className="mb-2 mb-sm-0"><strong>Attendees:</strong> <span className="fs-5 text-white ms-2">{participants.length}</span></span>
             <span><strong>Unit Coefficient:</strong> <span className="text-secondary ms-2">{unitPrice.toFixed(2)} CZK</span></span>
           </div>
         </div>
@@ -95,6 +96,7 @@ export default function PaymentSimulation() {
         <table className="table custom-table table-dark table-hover mb-0">
           <thead>
             <tr>
+              <th className="text-secondary text-center" style={{ width: '40px' }}>#</th>
               <th className="text-secondary">Participant</th>
               <th className="text-secondary">Nights</th>
               <th className="text-secondary text-end">Coef. (Nights<sup>0.6</sup>)</th>
@@ -104,12 +106,13 @@ export default function PaymentSimulation() {
             </tr>
           </thead>
           <tbody>
-            {participants.map(p => {
+            {participants.map((p, index) => {
               const coef = Math.pow(p.nights, 0.6);
               const price = coef * unitPrice;
               const pricePerNight = p.nights > 0 ? price / p.nights : 0;
               return (
                 <tr key={p.id}>
+                  <td className="align-middle text-secondary text-center">{index + 1}</td>
                   <td className="align-middle">
                     <input
                       type="text"
