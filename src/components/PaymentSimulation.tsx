@@ -6,23 +6,51 @@ type Participant = {
   nights: number;
 };
 
-const INITIAL_PARTICIPANTS: Participant[] = [
-  { id: 1, name: 'Alice (Full time)', nights: 7 },
-  { id: 2, name: 'Bob (Full time)', nights: 7 },
-  { id: 3, name: 'Charlie (Full time)', nights: 7 },
-  { id: 4, name: 'David (Full time)', nights: 7 },
-  { id: 5, name: 'Eve (Full time)', nights: 7 },
-  { id: 6, name: 'Frank (Full time)', nights: 7 },
-  { id: 7, name: 'Grace (Late departure)', nights: 5 },
-  { id: 8, name: 'Heidi (Half time)', nights: 3 },
-  { id: 9, name: 'Ivan (Weekend only)', nights: 2 },
-  { id: 10, name: 'Judy (Just visiting)', nights: 1 },
-];
+const PRESETS = {
+  simple: {
+    name: 'Simple example',
+    accommodationCost: 70000,
+    otherCost: 30000,
+    participants: [
+      { id: 1, name: 'Alice (Full time)', nights: 7 },
+      { id: 2, name: 'Bob (Full time)', nights: 7 },
+      { id: 3, name: 'Charlie (Full time)', nights: 7 },
+      { id: 4, name: 'David (Full time)', nights: 7 },
+      { id: 5, name: 'Eve (Full time)', nights: 7 },
+      { id: 6, name: 'Frank (Full time)', nights: 7 },
+      { id: 7, name: 'Grace (Late departure)', nights: 5 },
+      { id: 8, name: 'Heidi (Half time)', nights: 3 },
+      { id: 9, name: 'Ivan (Weekend only)', nights: 2 },
+      { id: 10, name: 'Judy (Just visiting)', nights: 1 },
+    ],
+  },
+  gt69: {
+    name: 'GT 6.9',
+    accommodationCost: 60000,
+    otherCost: 155341, // 215341 - 60000
+    participants: [6, 1, 7, 7, 7, 7, 7, 4, 5, 3, 3, 7, 7, 7, 7, 6, 4, 7, 7, 2, 7, 7, 7, 6, 7]
+      .sort((a, b) => b - a)
+      .map((nights, index) => ({
+        id: index + 1,
+        name: `Attendee ${index + 1}`,
+        nights,
+      })),
+  },
+};
 
 export default function PaymentSimulation() {
-  const [participants, setParticipants] = useState(INITIAL_PARTICIPANTS);
-  const [accommodationCost, setAccommodationCost] = useState(70000);
-  const [otherCost, setOtherCost] = useState(30000);
+  const [activePreset, setActivePreset] = useState<string | null>('simple');
+  const [participants, setParticipants] = useState(PRESETS.simple.participants);
+  const [accommodationCost, setAccommodationCost] = useState(PRESETS.simple.accommodationCost);
+  const [otherCost, setOtherCost] = useState(PRESETS.simple.otherCost);
+
+  const applyPreset = (key: keyof typeof PRESETS) => {
+    const preset = PRESETS[key];
+    setActivePreset(key);
+    setParticipants(preset.participants);
+    setAccommodationCost(preset.accommodationCost);
+    setOtherCost(preset.otherCost);
+  };
 
   const totalCost = accommodationCost + otherCost;
 
@@ -34,10 +62,12 @@ export default function PaymentSimulation() {
 
   const handleNightsChange = (id: number, nights: number) => {
     setParticipants(pts => pts.map(p => p.id === id ? { ...p, nights: Math.max(0, nights) } : p));
+    setActivePreset(null);
   };
 
   const handleNameChange = (id: number, name: string) => {
     setParticipants(pts => pts.map(p => p.id === id ? { ...p, name } : p));
+    setActivePreset(null);
   };
 
   const handleAddParticipant = () => {
@@ -45,15 +75,31 @@ export default function PaymentSimulation() {
       const nextId = pts.length > 0 ? Math.max(...pts.map(p => p.id)) + 1 : 1;
       return [...pts, { id: nextId, name: 'New Attendee', nights: 7 }];
     });
+    setActivePreset(null);
   };
 
   const handleRemoveParticipant = (id: number) => {
     setParticipants(pts => pts.filter(p => p.id !== id));
+    setActivePreset(null);
   };
 
   return (
     <div className="payment-simulation mt-4 p-4 border border-secondary rounded bg-dark">
-      <h5 className="mb-3 text-white"><i className="bi bi-calculator me-2"></i>Interactive Fair Split Simulation</h5>
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 text-white">
+        <h5 className="mb-3 mb-md-0"><i className="bi bi-calculator me-2"></i>Interactive Fair Split Simulation</h5>
+        <div>
+          <span className="text-secondary small me-2">Presets:</span>
+          {Object.entries(PRESETS).map(([key, preset]) => (
+            <button 
+              key={key} 
+              className={`btn btn-sm me-2 ${activePreset === key ? 'btn-info' : 'btn-outline-info'}`}
+              onClick={() => applyPreset(key as keyof typeof PRESETS)}
+            >
+              {preset.name}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="row mb-4">
         <div className="col-md-6 mb-3">
           <label className="form-label text-secondary small">Accommodation Cost (CZK)</label>
@@ -61,7 +107,7 @@ export default function PaymentSimulation() {
             type="number"
             className="form-control bg-dark text-white border-secondary"
             value={accommodationCost}
-            onChange={e => setAccommodationCost(Number(e.target.value))}
+            onChange={e => { setAccommodationCost(Number(e.target.value)); setActivePreset(null); }}
             min="0"
             step="1000"
           />
@@ -72,7 +118,7 @@ export default function PaymentSimulation() {
             type="number"
             className="form-control bg-dark text-white border-secondary"
             value={otherCost}
-            onChange={e => setOtherCost(Number(e.target.value))}
+            onChange={e => { setOtherCost(Number(e.target.value)); setActivePreset(null); }}
             min="0"
             step="1000"
           />
