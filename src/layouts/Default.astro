@@ -72,6 +72,35 @@ const gaId = PUBLIC_GA_ID;
 
   <body class="d-flex flex-column h-100">
     <Header activeId={activeId} />
+    
+    <div id="global-error-alert" class="alert alert-danger alert-dismissible fade show d-none position-fixed top-0 start-50 translate-middle-x mt-3 shadow" style="z-index: 1050; width: 90%; max-width: 600px;" role="alert">
+      <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>Access denied</h4>
+      <p>You are not a member of the required Discord guild.</p>
+      <hr>
+      <p class="mb-0">Please join our Discord server to continue.</p>
+      <div class="mt-3">
+        <a href="https://discord.com/invite/TnaMJMyTDw" class="button blue btn-sm d-inline-block text-decoration-none">
+          <i class="bi bi-discord me-2"></i> Join our Discord
+        </a>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', () => {
+        const url = new URL(window.location.href);
+        if (url.searchParams.get('error') === 'not_in_guild') {
+          const alertEl = document.getElementById('global-error-alert');
+          if (alertEl) {
+            alertEl.classList.remove('d-none');
+          }
+          // Properly remove ONLY the 'error' parameter from the URL so it doesn't stay there on refresh
+          url.searchParams.delete('error');
+          window.history.replaceState({}, document.title, url.pathname + url.search);
+        }
+      });
+    </script>
+
     <div class="main-container container">
       <section class="content h-100">
         <slot />
