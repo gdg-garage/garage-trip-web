@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "serverInfo": {
+    "name": "garage-trip-mcp",
+    "version": "1.0.0"
+  },
+  "endpoints": {
+    "sse": "https://api.garage-trip.cz/mcp/sse"
+  },
+  "capabilities": {
+    "tools": true,
+    "resources": false,
+    "prompts": false
+  }
+}
