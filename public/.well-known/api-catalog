@@ -1,0 +1,16 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://api.garage-trip.cz",
+      "service-desc": [
+        { "href": "https://api.garage-trip.cz/openapi.yaml", "type": "application/vnd.oai.openapi" }
+      ],
+      "service-doc": [
+        { "href": "https://api.garage-trip.cz/docs", "type": "text/html" }
+      ],
+      "status": [
+        { "href": "https://api.garage-trip.cz/health", "type": "application/json" }
+      ]
+    }
+  ]
+}
