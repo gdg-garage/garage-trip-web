@@ -110,5 +110,55 @@ const gaId = PUBLIC_GA_ID;
     <div class="background-pattern">
       <div class="background-pattern-inner"></div>
     </div>
+
+  <script is:inline>
+    // WebMCP — expose site tools to AI agents via the browser
+    // https://webmachinelearning.github.io/webmcp/
+    if (typeof navigator !== 'undefined' && navigator.modelContext && navigator.modelContext.provideContext) {
+      navigator.modelContext.provideContext({
+        tools: [
+          {
+            name: 'navigate',
+            description: 'Navigate to a page on the Garage Trip website.',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                page: {
+                  type: 'string',
+                  enum: ['home', 'payment', 'history', 'login', 'register'],
+                  description: 'The page to navigate to.'
+                }
+              },
+              required: ['page']
+            },
+            execute: ({ page }) => {
+              const routes = {
+                home: '/',
+                payment: '/payment',
+                history: '/history',
+                login: '/login',
+                register: '/register'
+              };
+              const path = routes[page];
+              if (path) {
+                window.location.href = path;
+                return { success: true, navigatedTo: path };
+              }
+              return { success: false, error: 'Unknown page' };
+            }
+          },
+          {
+            name: 'get_current_page',
+            description: 'Returns the current page path and title.',
+            inputSchema: { type: 'object', properties: {} },
+            execute: () => ({
+              path: window.location.pathname,
+              title: document.title
+            })
+          }
+        ]
+      });
+    }
+  </script>
   </body>
 </html>

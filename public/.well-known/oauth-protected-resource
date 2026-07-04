@@ -1,0 +1,7 @@
+{
+  "resource": "https://api.garage-trip.cz",
+  "authorization_servers": [
+    "https://api.garage-trip.cz"
+  ],
+  "scopes_supported": ["read", "write"]
+}

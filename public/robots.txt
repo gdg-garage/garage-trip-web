@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# AI Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Content Signals for AI Use
+Content-Signal: ai-train=no, search=yes, ai-input=no
+
+# Sitemap
+Sitemap: https://garage-trip.cz/sitemap-index.xml
