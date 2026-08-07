@@ -1,0 +1,161 @@
+---
+import Default from '../layouts/Default.astro';
+import ButtonLink from '../components/ButtonLink.astro';
+---
+
+<Default title="Spolek" activeId="spolek">
+  <div class="row mt-4">
+    <div class="col-lg-10 offset-lg-1">
+      <div class="box">
+        <h3>garage prague, z.s.;</h3>
+        <p class="text-secondary mb-4">
+          Official information about the non-profit organization behind Garage Trip.
+        </p>
+
+        <!-- English Section (First) -->
+        <div class="p-4 mb-4 border border-secondary rounded bg-dark">
+          <h4 class="text-white mb-3">
+            <i class="bi bi-building me-2 text-primary"></i>Organization Details
+          </h4>
+
+          <div class="table-responsive mb-4">
+            <table class="table table-dark table-borderless align-middle mb-0">
+              <tbody>
+                <tr>
+                  <td class="text-secondary small py-2" style="width: 220px; min-width: 180px;">
+                    <strong>Name of Association:</strong>
+                  </td>
+                  <td class="fs-5 fw-bold text-white py-2">Garage Prague, z.s.</td>
+                </tr>
+                <tr>
+                  <td class="text-secondary small py-2"><strong>Identification Number (IČO):</strong></td>
+                  <td class="fs-5 fw-bold monospace text-white py-2">29836174</td>
+                </tr>
+                <tr>
+                  <td class="text-secondary small py-2"><strong>Registered Office (Sídlo):</strong></td>
+                  <td class="text-white py-2">Holečkova 2477/72, Smíchov, 150 00 Praha 5, Czech Republic</td>
+                </tr>
+                <tr>
+                  <td class="text-secondary small py-2"><strong>Legal Form:</strong></td>
+                  <td class="text-white py-2">Spolek (Registered Non-Profit Association)</td>
+                </tr>
+                <tr>
+                  <td class="text-secondary small py-2"><strong>Transparent Account:</strong></td>
+                  <td class="py-2">
+                    <span class="badge bg-secondary text-light">TBD (Preparation in progress)</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-secondary small py-2"><strong>Public Register Record:</strong></td>
+                  <td class="py-2">
+                    <a
+                      href="https://or.justice.cz/ias/ui/rejstrik-firma.vysledky?subjektId=1328741&typ=PLATNY"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-info text-decoration-none fw-bold"
+                    >
+                      <i class="bi bi-box-arrow-up-right me-1"></i>View in Public Register (or.justice.cz)
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h5 class="text-white mb-3 mt-4">Official Documents</h5>
+          <div class="d-flex flex-wrap gap-2">
+            <a
+              href="/spolek/stanovy-garage-prague.pdf"
+              target="_blank"
+              class="btn btn-outline-info btn-sm"
+            >
+              <i class="bi bi-file-earmark-pdf me-1"></i>Articles of Association (Stanovy) [PDF, CZ]
+            </a>
+            <a
+              href="/spolek/zapis-z-ustavujici-schuze.pdf"
+              target="_blank"
+              class="btn btn-outline-info btn-sm"
+            >
+              <i class="bi bi-file-earmark-pdf me-1"></i>Minutes of Founding Meeting (Zápis) [PDF, CZ]
+            </a>
+          </div>
+        </div>
+
+        <!-- Czech Section (Second) -->
+        <div class="p-4 mb-4 border border-secondary rounded bg-dark">
+          <h4 class="text-white mb-3">
+            <i class="bi bi-info-circle me-2 text-primary"></i>Informace o spolku
+          </h4>
+
+          <div class="table-responsive mb-4">
+            <table class="table table-dark table-borderless align-middle mb-0">
+              <tbody>
+                <tr>
+                  <td class="text-secondary small py-2" style="width: 220px; min-width: 180px;">
+                    <strong>Název spolku:</strong>
+                  </td>
+                  <td class="fs-5 fw-bold text-white py-2">Garage Prague, z.s.</td>
+                </tr>
+                <tr>
+                  <td class="text-secondary small py-2"><strong>Identifikační číslo (IČO):</strong></td>
+                  <td class="fs-5 fw-bold monospace text-white py-2">29836174</td>
+                </tr>
+                <tr>
+                  <td class="text-secondary small py-2"><strong>Sídlo spolku:</strong></td>
+                  <td class="text-white py-2">Holečkova 2477/72, Smíchov, 150 00 Praha 5</td>
+                </tr>
+                <tr>
+                  <td class="text-secondary small py-2"><strong>Právní forma:</strong></td>
+                  <td class="text-white py-2">Spolek (zapsaný spolek)</td>
+                </tr>
+                <tr>
+                  <td class="text-secondary small py-2"><strong>Transparentní účet:</strong></td>
+                  <td class="py-2">
+                    <span class="badge bg-secondary text-light">Připravujeme (TBD)</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-secondary small py-2"><strong>Spolkový rejstřík:</strong></td>
+                  <td class="py-2">
+                    <a
+                      href="https://or.justice.cz/ias/ui/rejstrik-firma.vysledky?subjektId=1328741&typ=PLATNY"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-info text-decoration-none fw-bold"
+                    >
+                      <i class="bi bi-box-arrow-up-right me-1"></i>Záznam ve Veřejném rejstříku (or.justice.cz)
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h5 class="text-white mb-3 mt-4">Dokumenty ke stažení</h5>
+          <div class="d-flex flex-wrap gap-2">
+            <a
+              href="/spolek/stanovy-garage-prague.pdf"
+              target="_blank"
+              class="btn btn-outline-info btn-sm"
+            >
+              <i class="bi bi-file-earmark-pdf me-1"></i>Stanovy spolku [PDF]
+            </a>
+            <a
+              href="/spolek/zapis-z-ustavujici-schuze.pdf"
+              target="_blank"
+              class="btn btn-outline-info btn-sm"
+            >
+              <i class="bi bi-file-earmark-pdf me-1"></i>Zápis z ustavující schůze [PDF]
+            </a>
+          </div>
+        </div>
+
+        <div class="mt-4 text-center">
+          <a href="/" class="button purple">
+            <i class="bi bi-arrow-left"></i> Back to Homepage
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Default>
