@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { PUBLIC_API_BASE_URL } from 'astro:env/client';
 import clsx from 'clsx';
-import type { JoiningStatus, RegistrationHistoryItem } from '../regisration.types';
+import type { JoiningStatus } from '../regisration.types';
 
 export interface EventItem {
   id: number;
@@ -12,7 +12,7 @@ export interface EventItem {
   location?: string;
   description?: string;
   enabled: boolean;
-  status: 'active' | 'future' | 'past' | string;
+  status: 'future' | 'past' | string;
 }
 
 interface ApiRegistration {
@@ -34,6 +34,21 @@ interface MeResponse {
   registrations?: ApiRegistration[];
 }
 
+interface HistoryItem {
+  id?: number;
+  created_at: string;
+  event?: string;
+  user_id?: number;
+  fields?: {
+    arrival_date?: string;
+    departure_date?: string;
+    food_restrictions?: string;
+    children_count?: number;
+    cancelled?: boolean;
+    note?: string;
+  };
+}
+
 export default function UserEventsManager() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [selectedEventCode, setSelectedEventCode] = useState<string | null>(null);
@@ -48,7 +63,7 @@ export default function UserEventsManager() {
   // Selected event data
   const [userPaid, setUserPaid] = useState(false);
   const [userRegistration, setUserRegistration] = useState<ApiRegistration | null>(null);
-  const [userHistory, setUserHistory] = useState<RegistrationHistoryItem[]>([]);
+  const [userHistory, setUserHistory] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
 
   // User edit form state
@@ -190,9 +205,9 @@ export default function UserEventsManager() {
         }
       }
 
-      // Fetch history
+      // Fetch history with diff=false to have complete field snapshots
       const histRes = await fetch(
-        `${PUBLIC_API_BASE_URL}/history?event=${encodeURIComponent(eventCode)}`,
+        `${PUBLIC_API_BASE_URL}/history?event=${encodeURIComponent(eventCode)}&diff=false`,
         {
           headers: { Accept: 'application/json' },
           credentials: 'include',
@@ -200,7 +215,8 @@ export default function UserEventsManager() {
       );
       if (histRes.ok) {
         const histData = await histRes.json();
-        setUserHistory(Array.isArray(histData.history) ? histData.history : []);
+        const list = Array.isArray(histData.history) ? histData.history : [];
+        setUserHistory(list);
       }
     } catch (err) {
       console.error('Failed to load selected event details:', err);
@@ -347,7 +363,7 @@ export default function UserEventsManager() {
     );
   }
 
-  // VIEW 1: Vertical Event Selector List (when no event is currently chosen)
+  // VIEW 1: Vertical Event Selector List (when no event is chosen)
   if (!selectedEventCode || !currentEvent) {
     return (
       <div className="user-events-list">
@@ -371,10 +387,10 @@ export default function UserEventsManager() {
             {events.map((ev) => {
               const reg = registrationByEvent.get(ev.code);
 
-              let statusBadgeClass = 'bg-secondary';
-              if (ev.status === 'active') statusBadgeClass = 'bg-success';
-              if (ev.status === 'future') statusBadgeClass = 'bg-info text-dark';
-              if (ev.status === 'past') statusBadgeClass = 'bg-dark text-secondary border border-secondary';
+              let statusBadgeClass = 'bg-info text-dark';
+              if (ev.status === 'past') {
+                statusBadgeClass = 'bg-dark text-secondary border border-secondary';
+              }
 
               let regBadge = <span className="badge bg-secondary">Not registered</span>;
               let actionText = 'Register →';
@@ -466,10 +482,10 @@ export default function UserEventsManager() {
   }
 
   // VIEW 2: Selected Event Details & Registration Management
-  let statusBadgeClass = 'bg-secondary';
-  if (currentEvent.status === 'active') statusBadgeClass = 'bg-success';
-  if (currentEvent.status === 'future') statusBadgeClass = 'bg-info text-dark';
-  if (currentEvent.status === 'past') statusBadgeClass = 'bg-dark text-secondary';
+  let statusBadgeClass = 'bg-info text-dark';
+  if (currentEvent.status === 'past') {
+    statusBadgeClass = 'bg-dark text-secondary border border-secondary';
+  }
 
   let eventDates = 'Dates to be announced';
   if (currentEvent.start_date && currentEvent.end_date) {
@@ -493,6 +509,11 @@ export default function UserEventsManager() {
         </span>
       );
     }
+  }
+
+  let closedNoticeText = 'Registration has not opened yet or is currently locked by organizers.';
+  if (currentEvent.status === 'past') {
+    closedNoticeText = 'This is a past event. Registration is closed and preserved for archive.';
   }
 
   return (
@@ -551,11 +572,7 @@ export default function UserEventsManager() {
           <i className="bi bi-lock-fill fs-4"></i>
           <div>
             <strong>Registration is currently closed for this event.</strong>
-            <div className="small">
-              {currentEvent.status === 'past'
-                ? 'This event has concluded. You are viewing your historical registration summary.'
-                : 'Registration has not opened yet or is currently locked by organizers.'}
-            </div>
+            <div className="small">{closedNoticeText}</div>
           </div>
         </div>
       )}
@@ -573,24 +590,22 @@ export default function UserEventsManager() {
               onClick={() => setShowHistory(!showHistory)}
             >
               <i className="bi bi-clock-history me-1"></i>
-              {showHistory ? 'Hide history' : `History (${userHistory.length})`}
+              {showHistory ? 'Hide history' : `Audit Log (${userHistory.length})`}
             </button>
           )}
         </div>
 
-        <div className="row g-3">
+        <div className="row g-3 mb-4">
           <div className="col-md-4">
-            <div className="p-3 bg-dark rounded border border-secondary border-opacity-25">
-              <div className="text-secondary small text-uppercase fw-bold">Registration</div>
-              <div className="fs-5 mt-1">
-                {registrationStatusNode}
-              </div>
+            <div className="box text-center p-3 h-100 bg-dark">
+              <span className="text-secondary small">REGISTRATION</span>
+              <div className="fs-5 mt-1">{registrationStatusNode}</div>
             </div>
           </div>
 
           <div className="col-md-4">
-            <div className="p-3 bg-dark rounded border border-secondary border-opacity-25">
-              <div className="text-secondary small text-uppercase fw-bold">Payment</div>
+            <div className="box text-center p-3 h-100 bg-dark">
+              <span className="text-secondary small">PAYMENT</span>
               <div className="fs-5 mt-1">
                 {userPaid ? (
                   <span className="text-success fw-bold">
@@ -606,57 +621,121 @@ export default function UserEventsManager() {
           </div>
 
           <div className="col-md-4">
-            <div className="p-3 bg-dark rounded border border-secondary border-opacity-25">
-              <div className="text-secondary small text-uppercase fw-bold">Children</div>
-              <div className="fs-5 mt-1 text-white">
+            <div className="box text-center p-3 h-100 bg-dark">
+              <span className="text-secondary small">CHILDREN</span>
+              <h2 className="mb-0 text-info">
                 {userRegistration ? userRegistration.children_count || 0 : 0}
-              </div>
+              </h2>
             </div>
           </div>
         </div>
 
-        {/* History Log */}
-        {showHistory && userHistory.length > 0 && (
-          <div className="mt-4 pt-3 border-top border-secondary border-opacity-25">
-            <h6 className="text-secondary text-uppercase fw-bold mb-3">Audit Log</h6>
-            <div className="table-responsive">
-              <table className="custom-table">
-                <thead>
-                  <tr>
-                    <th>Timestamp</th>
-                    <th>User</th>
-                    <th>Action</th>
-                    <th>Dates</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {userHistory.map((h, i) => (
-                    <tr key={h.id || i}>
-                      <td className="small text-secondary">
-                        {h.CreatedAt ? new Date(h.CreatedAt).toLocaleString() : '-'}
-                      </td>
-                      <td>{h.Username || username}</td>
-                      <td>
-                        {h.cancelled ? (
-                          <span className="badge bg-danger">Cancelled</span>
-                        ) : (
-                          <span className="badge bg-success">Active</span>
-                        )}
-                      </td>
-                      <td className="small text-secondary">
-                        {h.arrival_date ? new Date(h.arrival_date).toLocaleDateString() : '-'} &rarr;{' '}
-                        {h.departure_date ? new Date(h.departure_date).toLocaleDateString() : '-'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        {/* Full Registration Details Display (visible whenever registered) */}
+        {userRegistration && (
+          <div className="p-3 bg-dark rounded border border-secondary border-opacity-25 mb-3">
+            <h6 className="text-secondary text-uppercase fw-bold mb-3">
+              <i className="bi bi-card-checklist me-2"></i>Registration Details
+            </h6>
+            <div className="row g-3">
+              <div className="col-sm-6 col-md-3">
+                <span className="text-secondary small d-block">Arrival:</span>
+                <strong>
+                  {userRegistration.arrival_date
+                    ? new Date(userRegistration.arrival_date).toLocaleString()
+                    : 'Not specified'}
+                </strong>
+              </div>
+              <div className="col-sm-6 col-md-3">
+                <span className="text-secondary small d-block">Departure:</span>
+                <strong>
+                  {userRegistration.departure_date
+                    ? new Date(userRegistration.departure_date).toLocaleString()
+                    : 'Not specified'}
+                </strong>
+              </div>
+              <div className="col-sm-6 col-md-3">
+                <span className="text-secondary small d-block">Dietary Restrictions:</span>
+                <strong>{userRegistration.food_restrictions || 'None'}</strong>
+              </div>
+              <div className="col-sm-6 col-md-3">
+                <span className="text-secondary small d-block">Note:</span>
+                <strong>{userRegistration.note || 'None'}</strong>
+              </div>
             </div>
+          </div>
+        )}
+
+        {/* History Log */}
+        {showHistory && (
+          <div className="mt-4 pt-3 border-top border-secondary border-opacity-25">
+            <h6 className="text-secondary text-uppercase fw-bold mb-3">
+              <i className="bi bi-clock-history me-2"></i>Audit History Log
+            </h6>
+            {userHistory.length === 0 ? (
+              <p className="text-secondary small mb-0">No past changes recorded for this event.</p>
+            ) : (
+              <div className="table-responsive">
+                <table className="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Status</th>
+                      <th>Dates</th>
+                      <th>Children</th>
+                      <th>Notes & Diet</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {userHistory.map((h, i) => {
+                      const fields = h.fields || {};
+                      const isItemCancelled = Boolean(fields.cancelled);
+
+                      let dateRangeStr = '-';
+                      if (fields.arrival_date && fields.departure_date) {
+                        const a = new Date(fields.arrival_date).toLocaleDateString();
+                        const d = new Date(fields.departure_date).toLocaleDateString();
+                        dateRangeStr = `${a} – ${d}`;
+                      }
+
+                      return (
+                        <tr key={h.id || i} className={clsx(isItemCancelled && 'opacity-50')}>
+                          <td className="small text-secondary">
+                            {h.created_at ? new Date(h.created_at).toLocaleString() : '-'}
+                          </td>
+                          <td>
+                            {isItemCancelled ? (
+                              <span className="badge bg-danger">Cancelled</span>
+                            ) : (
+                              <span className="badge bg-success">Attending</span>
+                            )}
+                          </td>
+                          <td className="small text-secondary">{dateRangeStr}</td>
+                          <td>{fields.children_count || 0}</td>
+                          <td className="small text-secondary">
+                            {fields.food_restrictions && (
+                              <div>
+                                <strong className="text-light">Diet:</strong> {fields.food_restrictions}
+                              </div>
+                            )}
+                            {fields.note && (
+                              <div>
+                                <strong className="text-light">Note:</strong> {fields.note}
+                              </div>
+                            )}
+                            {!fields.food_restrictions && !fields.note && <span>-</span>}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      {/* Registration Form (Only active when event is enabled) */}
+      {/* Registration Form (Active only when event registration is open) */}
       {currentEvent.enabled && (
         <div className="box mb-4">
           <h4 className="mb-3">

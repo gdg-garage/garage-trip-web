@@ -13,7 +13,7 @@ interface EventItem {
   location?: string;
   description?: string;
   enabled: boolean;
-  status: string;
+  status: 'future' | 'past' | string;
   created_at: string;
   updated_at: string;
 }
@@ -60,7 +60,7 @@ export default function OrgDashboard() {
   const [createEndDate, setCreateEndDate] = useState('');
   const [createLocation, setCreateLocation] = useState('');
   const [createDescription, setCreateDescription] = useState('');
-  const [createStatus, setCreateStatus] = useState('future');
+  const [createStatus, setCreateStatus] = useState<'future' | 'past'>('future');
   const [createEnabled, setCreateEnabled] = useState(false);
   const [createSubmitting, setCreateSubmitting] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -72,12 +72,12 @@ export default function OrgDashboard() {
   const [editEndDate, setEditEndDate] = useState('');
   const [editLocation, setEditLocation] = useState('');
   const [editDescription, setEditDescription] = useState('');
-  const [editStatus, setEditStatus] = useState('active');
+  const [editStatus, setEditStatus] = useState<'future' | 'past'>('future');
   const [editEnabled, setEditEnabled] = useState(false);
   const [editSubmitting, setEditSubmitting] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
-  // Toggle loading set
+  // Toggle loading
   const [togglingEventId, setTogglingEventId] = useState<number | null>(null);
 
   // Read URL query params on mount to support ?tab=...
@@ -205,7 +205,8 @@ export default function OrgDashboard() {
     setEditName(ev.name);
     setEditLocation(ev.location || '');
     setEditDescription(ev.description || '');
-    setEditStatus(ev.status || 'active');
+    const validStatus = ev.status === 'past' ? 'past' : 'future';
+    setEditStatus(validStatus);
     setEditEnabled(ev.enabled);
     setEditStartDate(ev.start_date ? ev.start_date.substring(0, 10) : '');
     setEditEndDate(ev.end_date ? ev.end_date.substring(0, 10) : '');
@@ -363,43 +364,62 @@ export default function OrgDashboard() {
 
   return (
     <div className="org-dashboard">
-      {/* Submenu Navigation */}
-      <div className="d-flex flex-wrap gap-2 mb-4 p-2 bg-dark rounded border border-secondary border-opacity-25">
-        <button
-          type="button"
-          onClick={() => switchSubmenu('events')}
-          className={clsx(
-            'btn btn-sm d-flex align-items-center gap-2 px-3 py-2',
-            activeSubmenu === 'events' ? 'btn-primary' : 'btn-outline-secondary'
-          )}
-        >
-          <i className="bi bi-gear-wide-connected"></i>
-          <span>Events Administration</span>
-        </button>
+      <style>{`
+        .org-submenu {
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          padding-bottom: 0.5rem;
+        }
+        .org-submenu-item {
+          color: #b9bbbe;
+          background: transparent;
+          border: none;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.9rem;
+          font-weight: 600;
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+        }
+        .org-submenu-item:hover {
+          color: #fff;
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+        .org-submenu-item.active {
+          color: #5865f2;
+          background-color: rgba(88, 101, 242, 0.1);
+        }
+      `}</style>
 
-        <button
-          type="button"
-          onClick={() => switchSubmenu('overview')}
-          className={clsx(
-            'btn btn-sm d-flex align-items-center gap-2 px-3 py-2',
-            activeSubmenu === 'overview' ? 'btn-primary' : 'btn-outline-secondary'
-          )}
-        >
-          <i className="bi bi-people-fill"></i>
-          <span>Event Overview (Attendees)</span>
-        </button>
+      {/* Submenu Navigation - Visually consistent with member area menu */}
+      <div className="org-submenu mb-4">
+        <div className="d-flex flex-wrap gap-2 gap-md-3">
+          <button
+            type="button"
+            onClick={() => switchSubmenu('events')}
+            className={clsx('org-submenu-item', activeSubmenu === 'events' && 'active')}
+          >
+            <i className="bi bi-gear-wide-connected me-2"></i>events administration
+          </button>
 
-        <button
-          type="button"
-          onClick={() => switchSubmenu('achievements')}
-          className={clsx(
-            'btn btn-sm d-flex align-items-center gap-2 px-3 py-2',
-            activeSubmenu === 'achievements' ? 'btn-primary' : 'btn-outline-secondary'
-          )}
-        >
-          <i className="bi bi-trophy-fill"></i>
-          <span>Global Achievements</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => switchSubmenu('overview')}
+            className={clsx('org-submenu-item', activeSubmenu === 'overview' && 'active')}
+          >
+            <i className="bi bi-people-fill me-2"></i>event overview
+          </button>
+
+          <button
+            type="button"
+            onClick={() => switchSubmenu('achievements')}
+            className={clsx('org-submenu-item', activeSubmenu === 'achievements' && 'active')}
+          >
+            <i className="bi bi-trophy-fill me-2"></i>global achievements
+          </button>
+        </div>
       </div>
 
       {/* SUBMENU 1: Events Administration */}
@@ -440,10 +460,10 @@ export default function OrgDashboard() {
               </thead>
               <tbody>
                 {events.map((ev) => {
-                  let statusBadgeClass = 'bg-secondary';
-                  if (ev.status === 'active') statusBadgeClass = 'bg-success';
-                  if (ev.status === 'future') statusBadgeClass = 'bg-info text-dark';
-                  if (ev.status === 'past') statusBadgeClass = 'bg-dark text-secondary';
+                  let statusBadgeClass = 'bg-info text-dark';
+                  if (ev.status === 'past') {
+                    statusBadgeClass = 'bg-dark text-secondary border border-secondary';
+                  }
 
                   let regBadgeClass = 'bg-danger';
                   let regBadgeText = 'Locked';
@@ -529,26 +549,28 @@ export default function OrgDashboard() {
       {/* SUBMENU 2: Event Overview (Attendees) */}
       {activeSubmenu === 'overview' && (
         <div className="event-overview-section">
-          <div className="row align-items-center mb-4">
-            <div className="col-md-6 mb-3 mb-md-0">
+          {/* Header & Event Selector */}
+          <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
               <h3 className="mb-1">Event Overview;</h3>
               <p className="text-secondary small mb-0">
                 View registrations and attendee details for any event.
               </p>
             </div>
-            <div className="col-md-6 d-flex justify-content-md-end align-items-center gap-2">
-              <label htmlFor="overviewEventSelect" className="small text-secondary text-nowrap fw-bold">
+            <div className="d-flex align-items-center gap-2">
+              <label htmlFor="overviewEventSelect" className="small text-secondary text-nowrap fw-bold mb-0">
                 Select Event:
               </label>
               <select
                 id="overviewEventSelect"
-                className="form-select form-select-sm bg-dark text-white border-secondary w-auto"
+                className="form-select form-select-sm bg-dark text-white border-secondary"
+                style={{ minWidth: '220px' }}
                 value={selectedOverviewEventCode}
                 onChange={(e) => setSelectedOverviewEventCode(e.target.value)}
               >
                 {events.map((ev) => (
                   <option key={ev.code} value={ev.code}>
-                    {ev.name} ({ev.code})
+                    {ev.name} ({ev.status})
                   </option>
                 ))}
               </select>
@@ -564,30 +586,30 @@ export default function OrgDashboard() {
             </div>
           </div>
 
-          {/* Stats Bar */}
-          <div className="row g-2 mb-4">
+          {/* Clean Stats Bar (Consistent with previous clean design) */}
+          <div className="row g-3 mb-4">
             <div className="col-6 col-md-3">
-              <div className="box p-3 text-center border-start border-4 border-success">
-                <div className="text-secondary small text-uppercase fw-bold">Joined</div>
-                <h3 className="mb-0 text-success">{overviewStats.joined}</h3>
+              <div className="box text-center p-3 h-100 bg-dark">
+                <span className="text-secondary small">JOINED</span>
+                <h2 className="mb-0 text-success">{overviewStats.joined}</h2>
               </div>
             </div>
             <div className="col-6 col-md-3">
-              <div className="col box p-3 text-center border-start border-4 border-primary">
-                <div className="text-secondary small text-uppercase fw-bold">Paid</div>
-                <h3 className="mb-0 text-primary">{overviewStats.paid}</h3>
+              <div className="box text-center p-3 h-100 bg-dark">
+                <span className="text-secondary small">PAID</span>
+                <h2 className="mb-0 text-primary">{overviewStats.paid}</h2>
               </div>
             </div>
             <div className="col-6 col-md-3">
-              <div className="box p-3 text-center border-start border-4 border-info">
-                <div className="text-secondary small text-uppercase fw-bold">Children</div>
-                <h3 className="mb-0 text-info">{overviewStats.kids}</h3>
+              <div className="box text-center p-3 h-100 bg-dark">
+                <span className="text-secondary small">KIDS</span>
+                <h2 className="mb-0 text-info">{overviewStats.kids}</h2>
               </div>
             </div>
             <div className="col-6 col-md-3">
-              <div className="box p-3 text-center border-start border-4 border-danger">
-                <div className="text-secondary small text-uppercase fw-bold">Cancelled</div>
-                <h3 className="mb-0 text-danger">{overviewStats.cancelled}</h3>
+              <div className="box text-center p-3 h-100 bg-dark">
+                <span className="text-secondary small">CANCELLED</span>
+                <h2 className="mb-0 text-danger">{overviewStats.cancelled}</h2>
               </div>
             </div>
           </div>
@@ -817,10 +839,9 @@ export default function OrgDashboard() {
                       <select
                         className="form-select bg-dark text-white border-secondary"
                         value={createStatus}
-                        onChange={(e) => setCreateStatus(e.target.value)}
+                        onChange={(e) => setCreateStatus(e.target.value as 'future' | 'past')}
                       >
                         <option value="future">future</option>
-                        <option value="active">active</option>
                         <option value="past">past</option>
                       </select>
                     </div>
@@ -932,9 +953,8 @@ export default function OrgDashboard() {
                       <select
                         className="form-select bg-dark text-white border-secondary"
                         value={editStatus}
-                        onChange={(e) => setEditStatus(e.target.value)}
+                        onChange={(e) => setEditStatus(e.target.value as 'future' | 'past')}
                       >
-                        <option value="active">active</option>
                         <option value="future">future</option>
                         <option value="past">past</option>
                       </select>
