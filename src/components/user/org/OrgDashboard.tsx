@@ -427,7 +427,7 @@ export default function OrgDashboard() {
         <div className="events-admin-section">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div>
-              <h3 className="mb-1">Events Administration;</h3>
+              <h3 className="mb-4">Events Administration;</h3>
               <p className="text-secondary small mb-0">
                 Configure event registration status, dates, and create new editions.
               </p>
@@ -552,7 +552,7 @@ export default function OrgDashboard() {
           {/* Header & Event Selector */}
           <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
             <div>
-              <h3 className="mb-1">Event Overview;</h3>
+              <h3 className="mb-4">Event Overview;</h3>
               <p className="text-secondary small mb-0">
                 View registrations and attendee details for any event.
               </p>
@@ -734,7 +734,7 @@ export default function OrgDashboard() {
       {activeSubmenu === 'achievements' && (
         <div className="achievements-section">
           <div className="mb-4">
-            <h3 className="mb-1">Global Achievements;</h3>
+            <h3 className="mb-4">Global Achievements;</h3>
             <p className="text-secondary small mb-0">
               Manage awards, icons, and automated Discord achievement roles across all events.
             </p>

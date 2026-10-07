@@ -368,7 +368,7 @@ export default function UserEventsManager() {
     return (
       <div className="user-events-list">
         <div className="mb-4">
-          <h3 className="mb-1">Events;</h3>
+          <h3 className="mb-4">Events;</h3>
           <p className="text-secondary small mb-0">
             Select an event to view details or manage your registration.
           </p>
@@ -534,7 +534,7 @@ export default function UserEventsManager() {
       <div className="box mb-4">
         <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-2">
           <div>
-            <h3 className="mb-1">{currentEvent.name};</h3>
+            <h3 className="mb-4">{currentEvent.name};</h3>
             <div className="text-secondary small d-flex flex-wrap align-items-center gap-3">
               <span>
                 <i className="bi bi-calendar3 me-1"></i>
