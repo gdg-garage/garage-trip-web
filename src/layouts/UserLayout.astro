@@ -6,7 +6,7 @@ import AuthGuard from '../components/auth/AuthGuard';
 
 interface Props {
   title: string;
-  activeTab: 'profile' | 'api-keys';
+  activeTab: 'profile' | 'events' | 'api-keys';
 }
 
 const { title, activeTab } = Astro.props;
@@ -16,7 +16,7 @@ const { title, activeTab } = Astro.props;
   <div class="row mt-4 mt-lg-5">
     <div class="col-12">
       <div class="box p-4 mb-4">
-        <h1 class="mb-4">user settings;</h1>
+        <h1 class="mb-4">member area;</h1>
         <UserMenu activeTab={activeTab} />
         <div class="user-content mt-4">
           <AuthGuard client:load>

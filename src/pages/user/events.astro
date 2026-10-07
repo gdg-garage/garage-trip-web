@@ -1,0 +1,8 @@
+---
+import UserLayout from '../../layouts/UserLayout.astro';
+import UserEventsManager from '../../components/user/UserEventsManager.tsx';
+---
+
+<UserLayout title="Events - Member Area" activeTab="events">
+  <UserEventsManager client:load />
+</UserLayout>

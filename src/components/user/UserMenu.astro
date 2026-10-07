@@ -1,6 +1,6 @@
 ---
 interface Props {
-  activeTab: 'profile' | 'api-keys';
+  activeTab: 'profile' | 'events' | 'api-keys';
 }
 
 const { activeTab } = Astro.props;
@@ -13,6 +13,12 @@ const { activeTab } = Astro.props;
       class:list={['user-menu-item', { active: activeTab === 'profile' }]}
     >
       <i class="bi bi-person-fill me-2"></i>profile
+    </a>
+    <a 
+      href="/user/events" 
+      class:list={['user-menu-item', { active: activeTab === 'events' }]}
+    >
+      <i class="bi bi-calendar-event-fill me-2"></i>events
     </a>
     <a 
       href="/user/api-keys" 

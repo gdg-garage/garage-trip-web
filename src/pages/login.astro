@@ -25,13 +25,11 @@ const apiBaseUrl = PUBLIC_API_BASE_URL;
 </Default>
 
 <script is:inline>
-  // Save redirect URL from query param to sessionStorage if present
+  // Save redirect URL from query param to sessionStorage if present, default to /user
   const urlParams = new URLSearchParams(window.location.search);
-  const redirect = urlParams.get('redirect');
-  if (redirect) {
-    sessionStorage.setItem('login_redirect', redirect);
-    console.log('Saved redirect target:', redirect);
-  }
+  const redirect = urlParams.get('redirect') || '/user';
+  sessionStorage.setItem('login_redirect', redirect);
+  console.log('Saved redirect target:', redirect);
 </script>
 
 <style>

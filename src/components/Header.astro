@@ -1,7 +1,7 @@
 ---
-import ButtonLink from './ButtonLink.astro';
 import GarageTripText from './GarageTripText';
 import UserHeaderLink from './UserHeaderLink.tsx';
+import HeaderAuthButton from './HeaderAuthButton.tsx';
 
 interface Props {
   activeId?: string;
@@ -34,12 +34,15 @@ const { activeId } = Astro.props;
       </div>
     </div>
     <div class="header-item">
-      <ButtonLink url="/register" text="join the event" variant="purple" size="small" target="_self" />
+      <HeaderAuthButton client:load />
     </div>
   </div>
   <div class="collapse menu-container-phone" id="navbarNavAltMarkup">
     <a class:list={['menu-link', { active: activeId === 'home' }]} href="/">/home</a>
     <a class:list={['menu-link', { active: activeId === 'history' }]} href="/history">/history</a>
     <UserHeaderLink client:load activeId={activeId} />
+    <div class="mt-2">
+      <HeaderAuthButton client:load />
+    </div>
   </div>
 </nav>

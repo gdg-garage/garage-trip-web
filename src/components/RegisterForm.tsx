@@ -285,6 +285,18 @@ export default function RegisterForm() {
             Welcome, <span className="secondary-color">{username}</span>!
           </p>
 
+          <div className="alert alert-secondary d-flex align-items-center gap-2 mb-4" role="alert">
+            <i className="bi bi-lock-fill text-warning fs-5"></i>
+            <div>
+              Registration for <strong>Garage Trip 7.0.0</strong> is currently locked.
+              You can view and manage your events in the{' '}
+              <a href="/user/events" className="secondary-color text-decoration-underline">
+                Member Area Events
+              </a>{' '}
+              section.
+            </div>
+          </div>
+
           <div className="mt-4 p-3 border border-secondary rounded bg-dark mb-4">
             <div className="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary pb-1">
               <h4 className="mb-0 small fw-bold text-secondary">registration status;</h4>
