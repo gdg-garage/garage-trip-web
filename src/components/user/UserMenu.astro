@@ -1,13 +1,13 @@
 ---
 interface Props {
-  activeTab: 'profile' | 'events' | 'api-keys';
+  activeTab: 'profile' | 'events' | 'api-keys' | 'org';
 }
 
 const { activeTab } = Astro.props;
 ---
 
 <div class="user-menu mb-4">
-  <div class="d-flex gap-3">
+  <div class="d-flex flex-wrap gap-2 gap-md-3">
     <a 
       href="/user" 
       class:list={['user-menu-item', { active: activeTab === 'profile' }]}
@@ -25,6 +25,13 @@ const { activeTab } = Astro.props;
       class:list={['user-menu-item', { active: activeTab === 'api-keys' }]}
     >
       <i class="bi bi-key-fill me-2"></i>api keys
+    </a>
+    <a 
+      href="/user/org" 
+      class:list={['user-menu-item', { active: activeTab === 'org' }]}
+      id="user-menu-org-link"
+    >
+      <i class="bi bi-shield-lock-fill me-2"></i>org
     </a>
   </div>
 </div>

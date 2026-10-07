@@ -1,0 +1,8 @@
+---
+import UserLayout from '../../layouts/UserLayout.astro';
+import OrgDashboard from '../../components/user/org/OrgDashboard';
+---
+
+<UserLayout title="Organization - Member Area" activeTab="org">
+  <OrgDashboard client:load />
+</UserLayout>

@@ -15,41 +15,6 @@ export interface EventItem {
   status: 'active' | 'future' | 'past' | string;
 }
 
-const FALLBACK_EVENTS: EventItem[] = [
-  {
-    id: 1,
-    code: 'g::t::7.0.0',
-    name: 'Garage Trip 7.0.0',
-    start_date: '2026-09-12T17:00:00Z',
-    end_date: '2026-09-19T10:00:00Z',
-    location: 'Nové Město na Moravě',
-    description: 'Seventh edition of the annual GDG Garage coding & gaming retreat.',
-    enabled: false,
-    status: 'active',
-  },
-  {
-    id: 2,
-    code: 'g::t::8.0.0',
-    name: 'Garage Trip 8.0.0',
-    start_date: '2027-09-11T17:00:00Z',
-    end_date: '2027-09-18T10:00:00Z',
-    description: 'Upcoming trip. Stay tuned!',
-    enabled: false,
-    status: 'future',
-  },
-  {
-    id: 3,
-    code: 'g::t::6.9',
-    name: 'Garage Trip 6.9',
-    start_date: '2025-09-20T17:00:00Z',
-    end_date: '2025-09-27T10:00:00Z',
-    location: 'Nový Svět',
-    description: 'Past event archive.',
-    enabled: false,
-    status: 'past',
-  },
-];
-
 interface ApiRegistration {
   id?: number;
   event: string;
@@ -65,27 +30,22 @@ interface MeResponse {
   username: string;
   email?: string;
   paid: boolean;
+  is_org?: boolean;
   registrations?: ApiRegistration[];
 }
 
-interface OrgRegistrationItem extends ApiRegistration {
-  paid: boolean;
-  username?: string;
-  User?: {
-    Username: string;
-    DiscordID?: string;
-  };
-}
-
 export default function UserEventsManager() {
-  const [events, setEvents] = useState<EventItem[]>(FALLBACK_EVENTS);
-  const [selectedEventCode, setSelectedEventCode] = useState<string>('g::t::7.0.0');
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [selectedEventCode, setSelectedEventCode] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // User registration state for the selected event
+  // User info & all registrations from /me
   const [username, setUsername] = useState('');
+  const [allUserRegistrations, setAllUserRegistrations] = useState<ApiRegistration[]>([]);
+
+  // Selected event data
   const [userPaid, setUserPaid] = useState(false);
   const [userRegistration, setUserRegistration] = useState<ApiRegistration | null>(null);
   const [userHistory, setUserHistory] = useState<RegistrationHistoryItem[]>([]);
@@ -93,9 +53,9 @@ export default function UserEventsManager() {
 
   // User edit form state
   const [formJoiningStatus, setFormJoiningStatus] = useState<JoiningStatus>('awaiting');
-  const [formArrivalDate, setFormArrivalDate] = useState('2026-09-12');
+  const [formArrivalDate, setFormArrivalDate] = useState('');
   const [formArrivalHour, setFormArrivalHour] = useState('17');
-  const [formDepartureDate, setFormDepartureDate] = useState('2026-09-19');
+  const [formDepartureDate, setFormDepartureDate] = useState('');
   const [formDepartureHour, setFormDepartureHour] = useState('10');
   const [formChildrenCount, setFormChildrenCount] = useState(0);
   const [formFoodRestrictions, setFormFoodRestrictions] = useState('');
@@ -103,159 +63,78 @@ export default function UserEventsManager() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formMessage, setFormMessage] = useState<{ text: string; type: 'success' | 'danger' } | null>(null);
 
-  // Org section state
-  const [isOrg, setIsOrg] = useState(false);
-  const [orgRegistrations, setOrgRegistrations] = useState<OrgRegistrationItem[]>([]);
-  const [orgLoading, setOrgLoading] = useState(false);
-  const [orgFilter, setOrgFilter] = useState<'all' | 'joined' | 'cancelled'>('joined');
-  const [orgSearch, setOrgSearch] = useState('');
-  const [orgActiveTab, setOrgActiveTab] = useState<'attendees' | 'manage_events'>('attendees');
-
-  // Org Create Event form state
-  const [showCreateEventForm, setShowCreateEventForm] = useState(false);
-  const [newEventCode, setNewEventCode] = useState('');
-  const [newEventName, setNewEventName] = useState('');
-  const [newEventStatus, setNewEventStatus] = useState<'future' | 'active' | 'past'>('future');
-  const [newEventStartDate, setNewEventStartDate] = useState('');
-  const [newEventEndDate, setNewEventEndDate] = useState('');
-  const [newEventLocation, setNewEventLocation] = useState('');
-  const [newEventDescription, setNewEventDescription] = useState('');
-  const [newEventEnabled, setNewEventEnabled] = useState(false);
-  const [createEventError, setCreateEventError] = useState<string | null>(null);
-  const [isCreatingEvent, setIsCreatingEvent] = useState(false);
-
-  // Fetch events list from API
-  const fetchEvents = useCallback(async () => {
-    try {
-      const response = await fetch(`${PUBLIC_API_BASE_URL}/events`, {
-        headers: { Accept: 'application/json' },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        if (Array.isArray(data.events) && data.events.length > 0) {
-          setEvents(data.events);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch events from API:', err);
+  // Map of registrations by event code
+  const registrationByEvent = useMemo(() => {
+    const map = new Map<string, ApiRegistration>();
+    for (const reg of allUserRegistrations) {
+      map.set(reg.event, reg);
     }
-  }, []);
+    return map;
+  }, [allUserRegistrations]);
 
-  useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
-
-  const currentEvent = useMemo(() => {
-    const found = events.find((e) => e.code === selectedEventCode);
-    if (found) {
-      return found;
-    }
-    return {
-      id: 0,
-      code: selectedEventCode,
-      name: selectedEventCode,
-      enabled: false,
-      status: 'active',
-    };
-  }, [events, selectedEventCode]);
-
-  const isEventLocked = !currentEvent.enabled;
-
-  // Load user data for selected event
-  const loadUserData = useCallback(async (eventCode: string) => {
+  // Fetch events list and user registrations
+  const loadInitialData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      setFormMessage(null);
 
-      const response = await fetch(`${PUBLIC_API_BASE_URL}/me?event=${encodeURIComponent(eventCode)}`, {
+      // 1. Fetch user data
+      const meRes = await fetch(`${PUBLIC_API_BASE_URL}/me`, {
         headers: { Accept: 'application/json' },
         credentials: 'include',
       });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          setError('Authentication required. Please log in.');
-          return;
-        }
-        throw new Error(`Failed to load profile: ${response.status}`);
+      if (meRes.ok) {
+        const meData: MeResponse = await meRes.json();
+        setUsername(meData.username || '');
+        const regs = Array.isArray(meData.registrations) ? meData.registrations : [];
+        setAllUserRegistrations(regs);
       }
 
-      const data: MeResponse = await response.json();
-      setUsername(data.username);
-      setUserPaid(data.paid);
-
-      if (Array.isArray(data.registrations)) {
-        const currentReg = data.registrations.find((r) => r.event === eventCode) || null;
-        setUserRegistration(currentReg);
-
-        if (currentReg) {
-          let joining: JoiningStatus = 'yes';
-          if (currentReg.cancelled) {
-            joining = 'no';
-          }
-          setFormJoiningStatus(joining);
-
-          if (currentReg.arrival_date) {
-            const arr = new Date(currentReg.arrival_date);
-            setFormArrivalDate(currentReg.arrival_date.split('T')[0]);
-            setFormArrivalHour(arr.getHours().toString());
-          }
-
-          if (currentReg.departure_date) {
-            const dep = new Date(currentReg.departure_date);
-            setFormDepartureDate(currentReg.departure_date.split('T')[0]);
-            setFormDepartureHour(dep.getHours().toString());
-          }
-
-          setFormChildrenCount(currentReg.children_count || 0);
-          setFormFoodRestrictions(currentReg.food_restrictions || '');
-          setFormNote(currentReg.note || '');
-        } else {
-          setFormJoiningStatus('awaiting');
-          setFormArrivalDate('2026-09-12');
-          setFormArrivalHour('17');
-          setFormDepartureDate('2026-09-19');
-          setFormDepartureHour('10');
-          setFormChildrenCount(0);
-          setFormFoodRestrictions('');
-          setFormNote('');
-        }
+      // 2. Fetch visible events (credentials included so server includes past registered events)
+      const evRes = await fetch(`${PUBLIC_API_BASE_URL}/events`, {
+        headers: { Accept: 'application/json' },
+        credentials: 'include',
+      });
+      if (evRes.ok) {
+        const data = await evRes.json();
+        const evList: EventItem[] = Array.isArray(data.events) ? data.events : [];
+        setEvents(evList);
       }
     } catch (err: any) {
-      console.error('Error loading user data:', err);
-      setError(err.message || 'Error loading user data');
+      console.error('Failed to load events/user data:', err);
+      setError('Unable to load events data. Please try refreshing.');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Load history for selected event
-  const loadHistory = useCallback(async (eventCode: string) => {
-    try {
-      const response = await fetch(
-        `${PUBLIC_API_BASE_URL}/history?event=${encodeURIComponent(eventCode)}&diff=false`,
-        {
-          headers: { Accept: 'application/json' },
-          credentials: 'include',
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        const list = Array.isArray(data.history) ? data.history : [];
-        setUserHistory(list);
-      }
-    } catch (err) {
-      console.error('Failed to load history:', err);
-    }
-  }, []);
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
 
-  // Check org permissions and load org registrations for selected event
-  const loadOrgRegistrations = useCallback(async (eventCode: string) => {
+  // Selected event object
+  const currentEvent = useMemo(() => {
+    if (!selectedEventCode) return null;
+    return events.find((e) => e.code === selectedEventCode) || null;
+  }, [events, selectedEventCode]);
+
+  // Load registration & history for selected event
+  const loadSelectedEventDetails = useCallback(async (eventCode: string) => {
     try {
-      setOrgLoading(true);
+      const ev = events.find((e) => e.code === eventCode);
+
+      // Default dates from event or fallbacks
+      let defaultArr = '2026-09-12';
+      let defaultDep = '2026-09-19';
+      if (ev?.start_date) {
+        defaultArr = ev.start_date.substring(0, 10);
+      }
+      if (ev?.end_date) {
+        defaultDep = ev.end_date.substring(0, 10);
+      }
+
       const response = await fetch(
-        `${PUBLIC_API_BASE_URL}/registrations?event=${encodeURIComponent(eventCode)}`,
+        `${PUBLIC_API_BASE_URL}/me?event=${encodeURIComponent(eventCode)}`,
         {
           headers: { Accept: 'application/json' },
           credentials: 'include',
@@ -263,39 +142,94 @@ export default function UserEventsManager() {
       );
 
       if (response.status === 200) {
-        setIsOrg(true);
-        const data = await response.json();
-        const raw = Array.isArray(data.registrations) ? data.registrations : [];
-        const mapped: OrgRegistrationItem[] = raw.map((r: any) => ({
-          ...r,
-          username: r.User?.Username || r.username || 'Unknown',
-        }));
-        setOrgRegistrations(mapped);
-      } else if (response.status === 403 || response.status === 401) {
-        setIsOrg(false);
-        setOrgRegistrations([]);
+        const data: MeResponse = await response.json();
+        setUsername(data.username || '');
+        setUserPaid(data.paid || false);
+
+        const regs = Array.isArray(data.registrations) ? data.registrations : [];
+        const found = regs.find((r) => r.event === eventCode) || null;
+        setUserRegistration(found);
+
+        if (found) {
+          if (found.cancelled) {
+            setFormJoiningStatus('no');
+          } else {
+            setFormJoiningStatus('yes');
+          }
+
+          if (found.arrival_date) {
+            const arr = new Date(found.arrival_date);
+            setFormArrivalDate(arr.toISOString().substring(0, 10));
+            setFormArrivalHour(String(arr.getUTCHours()));
+          } else {
+            setFormArrivalDate(defaultArr);
+            setFormArrivalHour('17');
+          }
+
+          if (found.departure_date) {
+            const dep = new Date(found.departure_date);
+            setFormDepartureDate(dep.toISOString().substring(0, 10));
+            setFormDepartureHour(String(dep.getUTCHours()));
+          } else {
+            setFormDepartureDate(defaultDep);
+            setFormDepartureHour('10');
+          }
+
+          setFormChildrenCount(found.children_count || 0);
+          setFormFoodRestrictions(found.food_restrictions || '');
+          setFormNote(found.note || '');
+        } else {
+          setFormJoiningStatus('awaiting');
+          setFormArrivalDate(defaultArr);
+          setFormArrivalHour('17');
+          setFormDepartureDate(defaultDep);
+          setFormDepartureHour('10');
+          setFormChildrenCount(0);
+          setFormFoodRestrictions('');
+          setFormNote('');
+        }
+      }
+
+      // Fetch history
+      const histRes = await fetch(
+        `${PUBLIC_API_BASE_URL}/history?event=${encodeURIComponent(eventCode)}`,
+        {
+          headers: { Accept: 'application/json' },
+          credentials: 'include',
+        }
+      );
+      if (histRes.ok) {
+        const histData = await histRes.json();
+        setUserHistory(Array.isArray(histData.history) ? histData.history : []);
       }
     } catch (err) {
-      console.error('Failed to check org role:', err);
-      setIsOrg(false);
-      setOrgRegistrations([]);
-    } finally {
-      setOrgLoading(false);
+      console.error('Failed to load selected event details:', err);
     }
-  }, []);
+  }, [events]);
 
   useEffect(() => {
-    loadUserData(selectedEventCode);
-    loadHistory(selectedEventCode);
-    loadOrgRegistrations(selectedEventCode);
-  }, [selectedEventCode, loadUserData, loadHistory, loadOrgRegistrations]);
+    if (selectedEventCode) {
+      loadSelectedEventDetails(selectedEventCode);
+      setFormMessage(null);
+    }
+  }, [selectedEventCode, loadSelectedEventDetails]);
 
-  // Handle user registration submission
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  // Handle form submit
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isEventLocked) {
+    if (!currentEvent) return;
+
+    if (!currentEvent.enabled) {
       setFormMessage({
-        text: 'This event is locked. Registrations cannot be created or modified.',
+        text: 'Registration for this event is closed.',
+        type: 'danger',
+      });
+      return;
+    }
+
+    if (formJoiningStatus === 'awaiting') {
+      setFormMessage({
+        text: 'Please choose whether you will attend (Yes or No).',
         type: 'danger',
       });
       return;
@@ -305,559 +239,416 @@ export default function UserEventsManager() {
       setIsSubmitting(true);
       setFormMessage(null);
 
-      const isJoining = formJoiningStatus === 'yes';
-
-      const parseDate = (d: string, h: string) => {
-        const dateObj = new Date(d);
-        dateObj.setHours(parseInt(h, 10), 0, 0, 0);
-        return dateObj.toISOString();
-      };
-
-      const childrenCount = isJoining ? formChildrenCount : 0;
-      const foodRestrictions = isJoining ? formFoodRestrictions : '';
+      const isCancelled = formJoiningStatus === 'no';
+      const arrIso = new Date(
+        `${formArrivalDate}T${formArrivalHour.padStart(2, '0')}:00:00Z`
+      ).toISOString();
+      const depIso = new Date(
+        `${formDepartureDate}T${formDepartureHour.padStart(2, '0')}:00:00Z`
+      ).toISOString();
 
       const payload = {
-        arrival_date: parseDate(formArrivalDate, formArrivalHour),
-        departure_date: parseDate(formDepartureDate, formDepartureHour),
-        children_count: childrenCount,
-        food_restrictions: foodRestrictions,
-        cancelled: !isJoining,
-        note: formNote,
-        event: selectedEventCode,
+        event: currentEvent.code,
+        cancelled: isCancelled,
+        arrival_date: arrIso,
+        departure_date: depIso,
+        children_count: Number(formChildrenCount),
+        food_restrictions: formFoodRestrictions.trim(),
+        note: formNote.trim(),
       };
 
-      const response = await fetch(`${PUBLIC_API_BASE_URL}/register`, {
+      const res = await fetch(`${PUBLIC_API_BASE_URL}/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(payload),
       });
 
-      if (response.ok) {
-        setFormMessage({ text: 'Registration updated successfully!', type: 'success' });
-        loadUserData(selectedEventCode);
-        loadHistory(selectedEventCode);
-        if (isOrg) {
-          loadOrgRegistrations(selectedEventCode);
+      if (res.ok) {
+        setFormMessage({
+          text: 'Registration successfully updated!',
+          type: 'success',
+        });
+        await loadSelectedEventDetails(currentEvent.code);
+        // Refresh all user registrations
+        const meRes = await fetch(`${PUBLIC_API_BASE_URL}/me`, {
+          credentials: 'include',
+        });
+        if (meRes.ok) {
+          const meData = await meRes.json();
+          setAllUserRegistrations(meData.registrations || []);
         }
       } else {
-        const errJson = await response.json().catch(() => null);
-        const errMsg = errJson?.detail || errJson?.title || 'Registration submission failed.';
-        setFormMessage({ text: errMsg, type: 'danger' });
+        const data = await res.json().catch(() => ({}));
+        setFormMessage({
+          text: data.detail || 'Failed to update registration.',
+          type: 'danger',
+        });
       }
     } catch (err: any) {
-      setFormMessage({ text: err.message || 'Network error occurred.', type: 'danger' });
+      setFormMessage({
+        text: err.message || 'Network error occurred.',
+        type: 'danger',
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Org toggle event enable/disable
-  const handleToggleEvent = async (eventId: number) => {
-    try {
-      const response = await fetch(`${PUBLIC_API_BASE_URL}/events/${eventId}/toggle`, {
-        method: 'POST',
-        headers: { Accept: 'application/json' },
-        credentials: 'include',
-      });
-      if (response.ok) {
-        await fetchEvents();
-      } else {
-        const err = await response.json().catch(() => null);
-        alert('Failed to toggle event: ' + (err?.detail || response.statusText));
-      }
-    } catch (err) {
-      console.error('Error toggling event:', err);
-      alert('Network error toggling event.');
-    }
-  };
-
-  // Org create new event
-  const handleCreateEvent = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newEventCode.trim() || !newEventName.trim()) {
-      setCreateEventError('Event Code and Name are required.');
-      return;
-    }
+  // Quick cancel
+  const handleCancelRegistration = async () => {
+    if (!currentEvent) return;
+    if (!confirm('Are you sure you want to cancel your registration?')) return;
 
     try {
-      setIsCreatingEvent(true);
-      setCreateEventError(null);
-
-      const payload: any = {
-        code: newEventCode.trim(),
-        name: newEventName.trim(),
-        status: newEventStatus,
-        enabled: newEventEnabled,
+      setIsSubmitting(true);
+      const payload = {
+        event: currentEvent.code,
+        cancelled: true,
       };
-
-      if (newEventStartDate) {
-        payload.start_date = new Date(newEventStartDate).toISOString();
-      }
-      if (newEventEndDate) {
-        payload.end_date = new Date(newEventEndDate).toISOString();
-      }
-      if (newEventLocation.trim()) {
-        payload.location = newEventLocation.trim();
-      }
-      if (newEventDescription.trim()) {
-        payload.description = newEventDescription.trim();
-      }
-
-      const response = await fetch(`${PUBLIC_API_BASE_URL}/events`, {
+      const res = await fetch(`${PUBLIC_API_BASE_URL}/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(payload),
       });
-
-      if (response.ok) {
-        setShowCreateEventForm(false);
-        setNewEventCode('');
-        setNewEventName('');
-        setNewEventLocation('');
-        setNewEventDescription('');
-        setNewEventStartDate('');
-        setNewEventEndDate('');
-        setNewEventEnabled(false);
-        await fetchEvents();
-      } else {
-        const errJson = await response.json().catch(() => null);
-        setCreateEventError(errJson?.detail || errJson?.title || 'Failed to create event.');
+      if (res.ok) {
+        setFormMessage({
+          text: 'Your registration has been cancelled.',
+          type: 'success',
+        });
+        setFormJoiningStatus('no');
+        await loadSelectedEventDetails(currentEvent.code);
       }
     } catch (err: any) {
-      setCreateEventError(err.message || 'Network error occurred.');
+      setFormMessage({ text: err.message, type: 'danger' });
     } finally {
-      setIsCreatingEvent(false);
+      setIsSubmitting(false);
     }
   };
-
-  // Filtered and searched org registrations
-  const filteredOrgRegistrations = useMemo(() => {
-    let list = orgRegistrations;
-    if (orgFilter === 'joined') {
-      list = list.filter((r) => !r.cancelled);
-    } else if (orgFilter === 'cancelled') {
-      list = list.filter((r) => r.cancelled);
-    }
-
-    if (orgSearch.trim()) {
-      const q = orgSearch.toLowerCase().trim();
-      list = list.filter((r) => {
-        const u = (r.username || '').toLowerCase();
-        const f = (r.food_restrictions || '').toLowerCase();
-        const n = (r.note || '').toLowerCase();
-        return u.includes(q) || f.includes(q) || n.includes(q);
-      });
-    }
-
-    return list;
-  }, [orgRegistrations, orgFilter, orgSearch]);
-
-  const orgStats = useMemo(() => {
-    const joined = orgRegistrations.filter((r) => !r.cancelled);
-    const paid = joined.filter((r) => r.paid).length;
-    const totalKids = joined.reduce((sum, r) => sum + (r.children_count || 0), 0);
-    return {
-      total: orgRegistrations.length,
-      joined: joined.length,
-      cancelled: orgRegistrations.length - joined.length,
-      paid,
-      kids: totalKids,
-    };
-  }, [orgRegistrations]);
-
-  // Compute user status label and badge class
-  let statusBadgeClass = 'bg-secondary';
-  let statusLabel = 'Not Registered';
-  if (userRegistration) {
-    if (userRegistration.cancelled) {
-      statusBadgeClass = 'bg-danger';
-      statusLabel = 'Cancelled';
-    } else {
-      statusBadgeClass = 'bg-success';
-      statusLabel = 'Attending';
-    }
-  }
-
-  let paidBadgeClass = 'bg-warning text-dark';
-  let paidLabel = 'Unpaid';
-  if (userPaid) {
-    paidBadgeClass = 'bg-success';
-    paidLabel = 'Paid';
-  }
-
-  let emptyOrgTableMessage = 'No registrations found.';
-  if (orgLoading) {
-    emptyOrgTableMessage = 'Loading registrations...';
-  }
-
-  // Format dates helper
-  const formatEventDates = (evt: EventItem) => {
-    if (evt.start_date && evt.end_date) {
-      const s = new Date(evt.start_date).toLocaleDateString('cs-CZ');
-      const e = new Date(evt.end_date).toLocaleDateString('cs-CZ');
-      return `${s} – ${e}`;
-    }
-    if (evt.start_date) {
-      return new Date(evt.start_date).toLocaleDateString('cs-CZ');
-    }
-    return 'Dates TBD';
-  };
-
-  const renderEventPills = () => (
-    <div className="mb-4">
-      <label className="text-secondary small text-uppercase fw-bold mb-2 d-block">
-        Select Event
-      </label>
-      <div className="d-flex flex-wrap gap-2">
-        {events.map((evt) => {
-          const isSelected = evt.code === selectedEventCode;
-          let btnClass = 'btn btn-outline-secondary';
-          if (isSelected) {
-            btnClass = 'btn btn-primary';
-          }
-          return (
-            <button
-              key={evt.code}
-              type="button"
-              className={clsx(btnClass, 'd-flex align-items-center gap-2')}
-              onClick={() => setSelectedEventCode(evt.code)}
-            >
-              <span>{evt.name}</span>
-              {!evt.enabled ? (
-                <span className="badge bg-dark text-warning border border-warning" title="Registration Closed">
-                  <i className="bi bi-lock-fill me-1"></i>locked
-                </span>
-              ) : (
-                <span className="badge bg-success" title="Registration Open">
-                  <i className="bi bi-unlock-fill me-1"></i>open
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-
-  const renderEventHeaderCard = () => (
-    <div className="box mb-4">
-      <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-        <div>
-          <h3 className="mb-1">{currentEvent.name};</h3>
-          <div className="text-secondary small">
-            <i className="bi bi-calendar3 me-2"></i>
-            {formatEventDates(currentEvent)}
-            {currentEvent.location && (
-              <span className="ms-3">
-                <i className="bi bi-geo-alt-fill me-1"></i>
-                {currentEvent.location}
-              </span>
-            )}
-            <span className="ms-3 badge bg-secondary">{currentEvent.status}</span>
-          </div>
-        </div>
-        <div>
-          {isEventLocked ? (
-            <span className="badge bg-warning text-dark px-3 py-2 fs-6">
-              <i className="bi bi-lock-fill me-1"></i> Locked
-            </span>
-          ) : (
-            <span className="badge bg-success px-3 py-2 fs-6">
-              <i className="bi bi-unlock-fill me-1"></i> Open for Registration
-            </span>
-          )}
-        </div>
-      </div>
-
-      {currentEvent.description && (
-        <p className="text-secondary mb-0">{currentEvent.description}</p>
-      )}
-    </div>
-  );
 
   if (loading) {
     return (
-      <div className="user-events-manager">
-        {renderEventPills()}
-        {renderEventHeaderCard()}
-        <div className="text-center p-5">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading event data...</span>
-          </div>
-          <p className="mt-3">Loading registration details...</p>
+      <div className="text-center p-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading events...</span>
         </div>
+        <p className="mt-3 text-secondary">Loading your events...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="user-events-manager">
-        {renderEventPills()}
-        {renderEventHeaderCard()}
-        <div className="box text-danger mb-4">
-          <h4>error;</h4>
-          <p>{error}</p>
-          <button
-            type="button"
-            className="button light mt-2"
-            onClick={() => loadUserData(selectedEventCode)}
-          >
-            Retry
-          </button>
-        </div>
+      <div className="alert alert-danger p-4 text-center">
+        <i className="bi bi-exclamation-triangle-fill me-2"></i>
+        {error}
       </div>
     );
   }
 
-  return (
-    <div className="user-events-manager">
-      {renderEventPills()}
-      {renderEventHeaderCard()}
+  // VIEW 1: Vertical Event Selector List (when no event is currently chosen)
+  if (!selectedEventCode || !currentEvent) {
+    return (
+      <div className="user-events-list">
+        <div className="mb-4">
+          <h3 className="mb-1">Events;</h3>
+          <p className="text-secondary small mb-0">
+            Select an event to view details or manage your registration.
+          </p>
+        </div>
 
-      {/* Section: User's Registration Administration */}
+        {events.length === 0 ? (
+          <div className="box p-5 text-center">
+            <i className="bi bi-calendar-x display-4 text-secondary mb-3 d-block"></i>
+            <h4>No Events Available</h4>
+            <p className="text-secondary mb-0">
+              There are currently no events open for registration. Check back soon!
+            </p>
+          </div>
+        ) : (
+          <div className="d-flex flex-column gap-3">
+            {events.map((ev) => {
+              const reg = registrationByEvent.get(ev.code);
+
+              let statusBadgeClass = 'bg-secondary';
+              if (ev.status === 'active') statusBadgeClass = 'bg-success';
+              if (ev.status === 'future') statusBadgeClass = 'bg-info text-dark';
+              if (ev.status === 'past') statusBadgeClass = 'bg-dark text-secondary border border-secondary';
+
+              let regBadge = <span className="badge bg-secondary">Not registered</span>;
+              let actionText = 'Register →';
+              if (reg) {
+                if (reg.cancelled) {
+                  regBadge = <span className="badge bg-danger">Cancelled</span>;
+                  actionText = 'View Registration →';
+                } else {
+                  regBadge = <span className="badge bg-success">Registered</span>;
+                  actionText = 'Manage Registration →';
+                }
+              } else if (!ev.enabled) {
+                actionText = 'View Event →';
+              }
+
+              let datesString = 'Dates to be announced';
+              if (ev.start_date && ev.end_date) {
+                const s = new Date(ev.start_date).toLocaleDateString();
+                const e = new Date(ev.end_date).toLocaleDateString();
+                datesString = `${s} – ${e}`;
+              }
+
+              return (
+                <div
+                  key={ev.code}
+                  className="box p-4 border border-secondary border-opacity-25"
+                  style={{
+                    cursor: 'pointer',
+                    transition: 'transform 0.15s ease, border-color 0.15s ease',
+                  }}
+                  onClick={() => setSelectedEventCode(ev.code)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(88, 101, 242, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(108, 117, 125, 0.25)';
+                  }}
+                >
+                  <div className="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                    <div>
+                      <h4 className="mb-1 text-white">{ev.name};</h4>
+                      <div className="text-secondary small d-flex flex-wrap align-items-center gap-3">
+                        <span>
+                          <i className="bi bi-calendar3 me-1"></i>
+                          {datesString}
+                        </span>
+                        {ev.location && (
+                          <span>
+                            <i className="bi bi-geo-alt-fill me-1"></i>
+                            {ev.location}
+                          </span>
+                        )}
+                        <span className={clsx('badge', statusBadgeClass)}>{ev.status}</span>
+                      </div>
+                    </div>
+                    <div className="d-flex align-items-center gap-2">
+                      {regBadge}
+                      {!ev.enabled && (
+                        <span className="badge bg-dark text-warning border border-warning">
+                          <i className="bi bi-lock-fill me-1"></i>closed
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {ev.description && (
+                    <p className="text-secondary small mb-3">{ev.description}</p>
+                  )}
+
+                  <div className="d-flex justify-content-end">
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedEventCode(ev.code);
+                      }}
+                    >
+                      {actionText}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // VIEW 2: Selected Event Details & Registration Management
+  let statusBadgeClass = 'bg-secondary';
+  if (currentEvent.status === 'active') statusBadgeClass = 'bg-success';
+  if (currentEvent.status === 'future') statusBadgeClass = 'bg-info text-dark';
+  if (currentEvent.status === 'past') statusBadgeClass = 'bg-dark text-secondary';
+
+  let eventDates = 'Dates to be announced';
+  if (currentEvent.start_date && currentEvent.end_date) {
+    const s = new Date(currentEvent.start_date).toLocaleDateString();
+    const e = new Date(currentEvent.end_date).toLocaleDateString();
+    eventDates = `${s} – ${e}`;
+  }
+
+  let registrationStatusNode = <span className="text-secondary">Not registered yet</span>;
+  if (userRegistration) {
+    if (userRegistration.cancelled) {
+      registrationStatusNode = (
+        <span className="text-danger fw-bold">
+          <i className="bi bi-x-circle-fill me-1"></i>Cancelled
+        </span>
+      );
+    } else {
+      registrationStatusNode = (
+        <span className="text-success fw-bold">
+          <i className="bi bi-check-circle-fill me-1"></i>Registered
+        </span>
+      );
+    }
+  }
+
+  return (
+    <div className="user-event-details">
+      {/* Back Button */}
+      <div className="mb-3">
+        <button
+          type="button"
+          className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2"
+          onClick={() => setSelectedEventCode(null)}
+        >
+          <i className="bi bi-arrow-left"></i>
+          <span>Back to events list</span>
+        </button>
+      </div>
+
+      {/* Event Header Banner */}
       <div className="box mb-4">
-        <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-          <h4 className="mb-0">my registration;</h4>
-          <div className="d-flex gap-2">
-            <span className={clsx('badge px-3 py-2', statusBadgeClass)}>
-              {statusLabel}
-            </span>
-            <span className={clsx('badge px-3 py-2', paidBadgeClass)}>
-              {paidLabel}
-            </span>
+        <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-2">
+          <div>
+            <h3 className="mb-1">{currentEvent.name};</h3>
+            <div className="text-secondary small d-flex flex-wrap align-items-center gap-3">
+              <span>
+                <i className="bi bi-calendar3 me-1"></i>
+                {eventDates}
+              </span>
+              {currentEvent.location && (
+                <span>
+                  <i className="bi bi-geo-alt-fill me-1"></i>
+                  {currentEvent.location}
+                </span>
+              )}
+              <span className={clsx('badge', statusBadgeClass)}>{currentEvent.status}</span>
+            </div>
+          </div>
+          <div>
+            {currentEvent.enabled ? (
+              <span className="badge bg-success px-3 py-2 fs-6">
+                <i className="bi bi-unlock-fill me-1"></i> Open
+              </span>
+            ) : (
+              <span className="badge bg-warning text-dark px-3 py-2 fs-6">
+                <i className="bi bi-lock-fill me-1"></i> Locked
+              </span>
+            )}
+          </div>
+        </div>
+        {currentEvent.description && (
+          <p className="text-secondary mb-0">{currentEvent.description}</p>
+        )}
+      </div>
+
+      {/* Registration Locked Banner */}
+      {!currentEvent.enabled && (
+        <div className="alert alert-warning d-flex align-items-center gap-3 mb-4">
+          <i className="bi bi-lock-fill fs-4"></i>
+          <div>
+            <strong>Registration is currently closed for this event.</strong>
+            <div className="small">
+              {currentEvent.status === 'past'
+                ? 'This event has concluded. You are viewing your historical registration summary.'
+                : 'Registration has not opened yet or is currently locked by organizers.'}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Registration Status Card */}
+      <div className="box mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h4 className="mb-0">
+            <i className="bi bi-person-badge-fill me-2"></i>your registration status;
+          </h4>
+          {userHistory.length > 0 && (
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-secondary"
+              onClick={() => setShowHistory(!showHistory)}
+            >
+              <i className="bi bi-clock-history me-1"></i>
+              {showHistory ? 'Hide history' : `History (${userHistory.length})`}
+            </button>
+          )}
+        </div>
+
+        <div className="row g-3">
+          <div className="col-md-4">
+            <div className="p-3 bg-dark rounded border border-secondary border-opacity-25">
+              <div className="text-secondary small text-uppercase fw-bold">Registration</div>
+              <div className="fs-5 mt-1">
+                {registrationStatusNode}
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-4">
+            <div className="p-3 bg-dark rounded border border-secondary border-opacity-25">
+              <div className="text-secondary small text-uppercase fw-bold">Payment</div>
+              <div className="fs-5 mt-1">
+                {userPaid ? (
+                  <span className="text-success fw-bold">
+                    <i className="bi bi-check2-circle me-1"></i>Paid
+                  </span>
+                ) : (
+                  <span className="text-warning">
+                    <i className="bi bi-clock me-1"></i>Awaiting / Unpaid
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-4">
+            <div className="p-3 bg-dark rounded border border-secondary border-opacity-25">
+              <div className="text-secondary small text-uppercase fw-bold">Children</div>
+              <div className="fs-5 mt-1 text-white">
+                {userRegistration ? userRegistration.children_count || 0 : 0}
+              </div>
+            </div>
           </div>
         </div>
 
-        {isEventLocked && (
-          <div className="alert alert-secondary d-flex align-items-center gap-2 mb-4" role="alert">
-            <i className="bi bi-lock-fill text-warning fs-5"></i>
-            <div>
-              Registration for <strong>{currentEvent.name}</strong> is currently locked.
-              Existing registrations are saved and read-only.
-            </div>
-          </div>
-        )}
-
-        {formMessage && (
-          <div
-            className={clsx(
-              'alert mb-4',
-              formMessage.type === 'success' ? 'alert-success' : 'alert-danger'
-            )}
-          >
-            {formMessage.text}
-          </div>
-        )}
-
-        <form onSubmit={handleFormSubmit}>
-          <div className="mb-4">
-            <label className="form-label text-secondary small text-uppercase fw-bold mb-2">
-              Attendance Status
-            </label>
-            <div className="d-flex gap-3">
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="radio"
-                  name="joiningStatus"
-                  id="statusJoined"
-                  value="yes"
-                  disabled={isEventLocked}
-                  checked={formJoiningStatus === 'yes'}
-                  onChange={() => setFormJoiningStatus('yes')}
-                />
-                <label className="form-check-label text-light" htmlFor="statusJoined">
-                  I'm attending
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="radio"
-                  name="joiningStatus"
-                  id="statusCancelled"
-                  value="no"
-                  disabled={isEventLocked}
-                  checked={formJoiningStatus === 'no'}
-                  onChange={() => setFormJoiningStatus('no')}
-                />
-                <label className="form-check-label text-light" htmlFor="statusCancelled">
-                  I'm not attending (cancelled)
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div className="row g-3 mb-3">
-            <div className="col-md-6">
-              <label className="form-label text-secondary small text-uppercase fw-bold">
-                Arrival Date
-              </label>
-              <input
-                type="date"
-                className="form-control"
-                disabled={isEventLocked || formJoiningStatus !== 'yes'}
-                value={formArrivalDate}
-                onChange={(e) => setFormArrivalDate(e.target.value)}
-              />
-            </div>
-            <div className="col-md-6">
-              <label className="form-label text-secondary small text-uppercase fw-bold">
-                Arrival Hour (0 - 23)
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="23"
-                className="form-control"
-                disabled={isEventLocked || formJoiningStatus !== 'yes'}
-                value={formArrivalHour}
-                onChange={(e) => setFormArrivalHour(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="row g-3 mb-3">
-            <div className="col-md-6">
-              <label className="form-label text-secondary small text-uppercase fw-bold">
-                Departure Date
-              </label>
-              <input
-                type="date"
-                className="form-control"
-                disabled={isEventLocked || formJoiningStatus !== 'yes'}
-                value={formDepartureDate}
-                onChange={(e) => setFormDepartureDate(e.target.value)}
-              />
-            </div>
-            <div className="col-md-6">
-              <label className="form-label text-secondary small text-uppercase fw-bold">
-                Departure Hour (0 - 23)
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="23"
-                className="form-control"
-                disabled={isEventLocked || formJoiningStatus !== 'yes'}
-                value={formDepartureHour}
-                onChange={(e) => setFormDepartureHour(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="row g-3 mb-3">
-            <div className="col-md-6">
-              <label className="form-label text-secondary small text-uppercase fw-bold">
-                Children Count
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="10"
-                className="form-control"
-                disabled={isEventLocked || formJoiningStatus !== 'yes'}
-                value={formChildrenCount}
-                onChange={(e) => setFormChildrenCount(parseInt(e.target.value, 10) || 0)}
-              />
-            </div>
-            <div className="col-md-6">
-              <label className="form-label text-secondary small text-uppercase fw-bold">
-                Food Restrictions / Allergies
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                disabled={isEventLocked || formJoiningStatus !== 'yes'}
-                placeholder="Vegetarian, vegan, lactose intolerance, gluten-free, etc."
-                value={formFoodRestrictions}
-                onChange={(e) => setFormFoodRestrictions(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <label className="form-label text-secondary small text-uppercase fw-bold">
-              Note
-            </label>
-            <textarea
-              className="form-control"
-              rows={3}
-              disabled={isEventLocked}
-              placeholder="Any questions, room preferences, arrival notes..."
-              value={formNote}
-              onChange={(e) => setFormNote(e.target.value)}
-            />
-          </div>
-
-          <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <button
-              type="submit"
-              disabled={isEventLocked || isSubmitting}
-              className="button purple"
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                  Saving...
-                </>
-              ) : (
-                'Save Registration'
-              )}
-            </button>
-
-            {userHistory.length > 0 && (
-              <button
-                type="button"
-                className="button light small"
-                onClick={() => setShowHistory(!showHistory)}
-              >
-                <i className="bi bi-clock-history me-2"></i>
-                {showHistory ? 'Hide Change History' : `View Change History (${userHistory.length})`}
-              </button>
-            )}
-          </div>
-        </form>
-
-        {/* Registration History Log */}
+        {/* History Log */}
         {showHistory && userHistory.length > 0 && (
-          <div className="mt-4 pt-4 border-top border-secondary">
-            <h5 className="mb-3 text-secondary">Registration Changes History;</h5>
+          <div className="mt-4 pt-3 border-top border-secondary border-opacity-25">
+            <h6 className="text-secondary text-uppercase fw-bold mb-3">Audit Log</h6>
             <div className="table-responsive">
-              <table className="table table-dark table-sm custom-table">
+              <table className="custom-table">
                 <thead>
                   <tr>
-                    <th>Date & Time</th>
-                    <th>Status</th>
-                    <th>Arrival</th>
-                    <th>Departure</th>
-                    <th>Kids</th>
-                    <th>Food</th>
-                    <th>Note</th>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Dates</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {userHistory.map((item, idx) => {
-                    const isCancelled = item.fields?.cancelled === true;
-                    return (
-                      <tr key={idx}>
-                        <td>{new Date(item.created_at).toLocaleString('cs-CZ')}</td>
-                        <td>
-                          <span className={clsx('badge', isCancelled ? 'bg-danger' : 'bg-success')}>
-                            {isCancelled ? 'Cancelled' : 'Joined'}
-                          </span>
-                        </td>
-                        <td>{item.fields?.arrival_date ? new Date(item.fields.arrival_date).toLocaleString('cs-CZ') : '-'}</td>
-                        <td>{item.fields?.departure_date ? new Date(item.fields.departure_date).toLocaleString('cs-CZ') : '-'}</td>
-                        <td>{item.fields?.children_count ?? '-'}</td>
-                        <td>{item.fields?.food_restrictions || '-'}</td>
-                        <td>{item.fields?.note || '-'}</td>
-                      </tr>
-                    );
-                  })}
+                  {userHistory.map((h, i) => (
+                    <tr key={h.id || i}>
+                      <td className="small text-secondary">
+                        {h.CreatedAt ? new Date(h.CreatedAt).toLocaleString() : '-'}
+                      </td>
+                      <td>{h.Username || username}</td>
+                      <td>
+                        {h.cancelled ? (
+                          <span className="badge bg-danger">Cancelled</span>
+                        ) : (
+                          <span className="badge bg-success">Active</span>
+                        )}
+                      </td>
+                      <td className="small text-secondary">
+                        {h.arrival_date ? new Date(h.arrival_date).toLocaleDateString() : '-'} &rarr;{' '}
+                        {h.departure_date ? new Date(h.departure_date).toLocaleDateString() : '-'}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -865,416 +656,161 @@ export default function UserEventsManager() {
         )}
       </div>
 
-      {/* Section: Org Administration (Shown only if the person has the role) */}
-      {isOrg && (
-        <div className="box mt-5">
-          <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3 border-bottom pb-3 border-secondary">
-            <div>
-              <h4 className="mb-1 text-warning">
-                <i className="bi bi-shield-lock-fill me-2"></i>organizer administration;
-              </h4>
-              <span className="text-secondary small">
-                Managing events and attendee registrations
-              </span>
-            </div>
-            <div className="d-flex gap-2">
-              <a href="/org/achievements" className="btn btn-sm btn-outline-warning">
-                <i className="bi bi-trophy-fill me-1"></i> Org Achievements
-              </a>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-primary"
-                onClick={() => {
-                  fetchEvents();
-                  loadOrgRegistrations(selectedEventCode);
-                }}
-                disabled={orgLoading}
-                title="Refresh data"
-              >
-                <i className="bi bi-arrow-clockwise"></i>
-              </button>
-            </div>
-          </div>
+      {/* Registration Form (Only active when event is enabled) */}
+      {currentEvent.enabled && (
+        <div className="box mb-4">
+          <h4 className="mb-3">
+            <i className="bi bi-pencil-square me-2"></i>manage registration;
+          </h4>
 
-          {/* Org Tab Navigation: Attendees vs Manage Events */}
-          <div className="btn-group mb-4">
-            <button
-              type="button"
-              className={clsx('btn btn-sm btn-outline-secondary', orgActiveTab === 'attendees' && 'active')}
-              onClick={() => setOrgActiveTab('attendees')}
-            >
-              <i className="bi bi-people-fill me-2"></i>Attendees ({currentEvent.name})
-            </button>
-            <button
-              type="button"
-              className={clsx('btn btn-sm btn-outline-secondary', orgActiveTab === 'manage_events' && 'active')}
-              onClick={() => setOrgActiveTab('manage_events')}
-            >
-              <i className="bi bi-calendar-check-fill me-2"></i>Manage Events ({events.length})
-            </button>
-          </div>
+          {formMessage && (
+            <div className={clsx('alert py-2 mb-3', `alert-${formMessage.type}`)}>
+              {formMessage.text}
+            </div>
+          )}
 
-          {orgActiveTab === 'manage_events' && (
-            <div className="events-administration mb-4">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="mb-0 text-light">Events Administration;</h5>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label className="form-label text-secondary small text-uppercase fw-bold">
+                Are you attending? *
+              </label>
+              <div className="d-flex gap-2">
                 <button
                   type="button"
-                  className="btn btn-sm btn-primary"
-                  onClick={() => setShowCreateEventForm(!showCreateEventForm)}
+                  className={clsx(
+                    'btn px-4',
+                    formJoiningStatus === 'yes' ? 'btn-success' : 'btn-outline-secondary'
+                  )}
+                  onClick={() => setFormJoiningStatus('yes')}
                 >
-                  <i className="bi bi-plus-circle me-1"></i>
-                  {showCreateEventForm ? 'Cancel' : 'Create Event'}
+                  <i className="bi bi-check-lg me-1"></i>Yes, I am going
+                </button>
+                <button
+                  type="button"
+                  className={clsx(
+                    'btn px-4',
+                    formJoiningStatus === 'no' ? 'btn-danger' : 'btn-outline-secondary'
+                  )}
+                  onClick={() => setFormJoiningStatus('no')}
+                >
+                  <i className="bi bi-x-lg me-1"></i>No, cannot attend
                 </button>
               </div>
-
-              {/* Create Event Form */}
-              {showCreateEventForm && (
-                <div className="p-4 border border-secondary rounded bg-dark mb-4">
-                  <h6 className="mb-3 text-warning">Create New Event;</h6>
-
-                  {createEventError && (
-                    <div className="alert alert-danger py-2">{createEventError}</div>
-                  )}
-
-                  <form onSubmit={handleCreateEvent}>
-                    <div className="row g-3 mb-3">
-                      <div className="col-md-6">
-                        <label className="form-label text-secondary small fw-bold">Code / Identifier</label>
-                        <input
-                          type="text"
-                          className="form-control form-control-sm"
-                          placeholder="e.g. g::t::8.0.0"
-                          value={newEventCode}
-                          onChange={(e) => setNewEventCode(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label text-secondary small fw-bold">Event Name</label>
-                        <input
-                          type="text"
-                          className="form-control form-control-sm"
-                          placeholder="e.g. Garage Trip 8.0.0"
-                          value={newEventName}
-                          onChange={(e) => setNewEventName(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="row g-3 mb-3">
-                      <div className="col-md-4">
-                        <label className="form-label text-secondary small fw-bold">Status</label>
-                        <select
-                          className="form-select form-select-sm"
-                          value={newEventStatus}
-                          onChange={(e: any) => setNewEventStatus(e.target.value)}
-                        >
-                          <option value="future">future</option>
-                          <option value="active">active</option>
-                          <option value="past">past</option>
-                        </select>
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label text-secondary small fw-bold">Start Date</label>
-                        <input
-                          type="date"
-                          className="form-control form-control-sm"
-                          value={newEventStartDate}
-                          onChange={(e) => setNewEventStartDate(e.target.value)}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label text-secondary small fw-bold">End Date</label>
-                        <input
-                          type="date"
-                          className="form-control form-control-sm"
-                          value={newEventEndDate}
-                          onChange={(e) => setNewEventEndDate(e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="row g-3 mb-3">
-                      <div className="col-md-6">
-                        <label className="form-label text-secondary small fw-bold">Location</label>
-                        <input
-                          type="text"
-                          className="form-control form-control-sm"
-                          placeholder="e.g. Nové Město na Moravě"
-                          value={newEventLocation}
-                          onChange={(e) => setNewEventLocation(e.target.value)}
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label text-secondary small fw-bold">Description</label>
-                        <input
-                          type="text"
-                          className="form-control form-control-sm"
-                          placeholder="Optional notes or details"
-                          value={newEventDescription}
-                          onChange={(e) => setNewEventDescription(e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-check mb-3">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id="newEventEnabledCheck"
-                        checked={newEventEnabled}
-                        onChange={(e) => setNewEventEnabled(e.target.checked)}
-                      />
-                      <label className="form-check-label text-light small" htmlFor="newEventEnabledCheck">
-                        Enable registration immediately (open)
-                      </label>
-                    </div>
-
-                    <div className="d-flex gap-2">
-                      <button
-                        type="submit"
-                        className="btn btn-sm btn-success"
-                        disabled={isCreatingEvent}
-                      >
-                        {isCreatingEvent ? 'Creating...' : 'Create Event'}
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-secondary"
-                        onClick={() => setShowCreateEventForm(false)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              )}
-
-              {/* Events Table */}
-              <div className="table-responsive">
-                <table className="table table-dark table-hover table-striped custom-table">
-                  <thead>
-                    <tr>
-                      <th>Code</th>
-                      <th>Name</th>
-                      <th>Dates</th>
-                      <th>Location</th>
-                      <th>Status</th>
-                      <th>Registration</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {events.map((evt) => {
-                      let statusBadge = 'bg-secondary';
-                      if (evt.status === 'active') {
-                        statusBadge = 'bg-primary';
-                      } else if (evt.status === 'future') {
-                        statusBadge = 'bg-info text-dark';
-                      }
-
-                      return (
-                        <tr key={evt.code}>
-                          <td className="monospace fw-bold">{evt.code}</td>
-                          <td>{evt.name}</td>
-                          <td>{formatEventDates(evt)}</td>
-                          <td>{evt.location || '-'}</td>
-                          <td>
-                            <span className={clsx('badge', statusBadge)}>
-                              {evt.status}
-                            </span>
-                          </td>
-                          <td>
-                            {evt.enabled ? (
-                              <span className="badge bg-success">
-                                <i className="bi bi-unlock-fill me-1"></i>Enabled
-                              </span>
-                            ) : (
-                              <span className="badge bg-danger">
-                                <i className="bi bi-lock-fill me-1"></i>Disabled
-                              </span>
-                            )}
-                          </td>
-                          <td>
-                            <button
-                              type="button"
-                              className={clsx(
-                                'btn btn-sm',
-                                evt.enabled ? 'btn-outline-warning' : 'btn-outline-success'
-                              )}
-                              onClick={() => handleToggleEvent(evt.id)}
-                            >
-                              {evt.enabled ? (
-                                <>
-                                  <i className="bi bi-lock me-1"></i>Disable
-                                </>
-                              ) : (
-                                <>
-                                  <i className="bi bi-unlock me-1"></i>Enable
-                                </>
-                              )}
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
             </div>
-          )}
 
-          {orgActiveTab === 'attendees' && (
-            <>
-              {/* Stats Overview */}
-              <div className="row mb-4 gy-3">
-                <div className="col-6 col-md-3">
-                  <div className="box text-center p-3 h-100 bg-dark">
-                    <span className="text-secondary small">JOINED</span>
-                    <h2 className="mb-0 text-success">{orgStats.joined}</h2>
+            {formJoiningStatus === 'yes' && (
+              <>
+                <div className="row g-3 mb-3">
+                  <div className="col-md-6">
+                    <label className="form-label small text-secondary">Arrival Date & Hour</label>
+                    <div className="input-group">
+                      <input
+                        type="date"
+                        className="form-control bg-dark text-white border-secondary"
+                        value={formArrivalDate}
+                        onChange={(e) => setFormArrivalDate(e.target.value)}
+                        required
+                      />
+                      <select
+                        className="form-select bg-dark text-white border-secondary"
+                        style={{ maxWidth: '100px' }}
+                        value={formArrivalHour}
+                        onChange={(e) => setFormArrivalHour(e.target.value)}
+                      >
+                        {Array.from({ length: 24 }).map((_, i) => (
+                          <option key={i} value={String(i)}>
+                            {String(i).padStart(2, '0')}:00
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                </div>
-                <div className="col-6 col-md-3">
-                  <div className="box text-center p-3 h-100 bg-dark">
-                    <span className="text-secondary small">PAID</span>
-                    <h2 className="mb-0 text-primary">{orgStats.paid}</h2>
-                  </div>
-                </div>
-                <div className="col-6 col-md-3">
-                  <div className="box text-center p-3 h-100 bg-dark">
-                    <span className="text-secondary small">KIDS</span>
-                    <h2 className="mb-0 text-info">{orgStats.kids}</h2>
-                  </div>
-                </div>
-                <div className="col-6 col-md-3">
-                  <div className="box text-center p-3 h-100 bg-dark">
-                    <span className="text-secondary small">CANCELLED</span>
-                    <h2 className="mb-0 text-danger">{orgStats.cancelled}</h2>
-                  </div>
-                </div>
-              </div>
 
-              {/* Filter and Search Controls */}
-              <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
-                <div className="btn-group">
-                  <button
-                    type="button"
-                    className={clsx('btn btn-sm btn-outline-secondary', orgFilter === 'joined' && 'active')}
-                    onClick={() => setOrgFilter('joined')}
-                  >
-                    Joined ({orgStats.joined})
-                  </button>
-                  <button
-                    type="button"
-                    className={clsx('btn btn-sm btn-outline-secondary', orgFilter === 'cancelled' && 'active')}
-                    onClick={() => setOrgFilter('cancelled')}
-                  >
-                    Cancelled ({orgStats.cancelled})
-                  </button>
-                  <button
-                    type="button"
-                    className={clsx('btn btn-sm btn-outline-secondary', orgFilter === 'all' && 'active')}
-                    onClick={() => setOrgFilter('all')}
-                  >
-                    All ({orgStats.total})
-                  </button>
+                  <div className="col-md-6">
+                    <label className="form-label small text-secondary">Departure Date & Hour</label>
+                    <div className="input-group">
+                      <input
+                        type="date"
+                        className="form-control bg-dark text-white border-secondary"
+                        value={formDepartureDate}
+                        onChange={(e) => setFormDepartureDate(e.target.value)}
+                        required
+                      />
+                      <select
+                        className="form-select bg-dark text-white border-secondary"
+                        style={{ maxWidth: '100px' }}
+                        value={formDepartureHour}
+                        onChange={(e) => setFormDepartureHour(e.target.value)}
+                      >
+                        {Array.from({ length: 24 }).map((_, i) => (
+                          <option key={i} value={String(i)}>
+                            {String(i).padStart(2, '0')}:00
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="input-group" style={{ maxWidth: '300px' }}>
-                  <span className="input-group-text bg-dark text-secondary border-secondary">
-                    <i className="bi bi-search"></i>
-                  </span>
+                <div className="mb-3">
+                  <label className="form-label small text-secondary">Accompanying Children</label>
                   <input
-                    type="text"
-                    className="form-control form-control-sm bg-dark text-light border-secondary"
-                    placeholder="Search attendee..."
-                    value={orgSearch}
-                    onChange={(e) => setOrgSearch(e.target.value)}
+                    type="number"
+                    min="0"
+                    max="10"
+                    className="form-control bg-dark text-white border-secondary"
+                    style={{ maxWidth: '150px' }}
+                    value={formChildrenCount}
+                    onChange={(e) => setFormChildrenCount(Number(e.target.value))}
                   />
                 </div>
-              </div>
 
-              {/* Registrations Table */}
-              <div className="table-responsive">
-                <table className="table table-dark table-hover table-striped custom-table">
-                  <thead>
-                    <tr>
-                      <th>Username</th>
-                      <th>Status</th>
-                      <th>Paid</th>
-                      <th>Arrival</th>
-                      <th>Departure</th>
-                      <th>Kids</th>
-                      <th>Food</th>
-                      <th>Note</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredOrgRegistrations.length === 0 ? (
-                      <tr>
-                        <td colSpan={8} className="text-center p-4 text-secondary">
-                          {emptyOrgTableMessage}
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredOrgRegistrations.map((reg, idx) => (
-                        <tr key={idx} className={clsx({ 'opacity-50': reg.cancelled })}>
-                          <td>{reg.username}</td>
-                          <td>
-                            <span className={clsx('badge', reg.cancelled ? 'bg-danger' : 'bg-success')}>
-                              {reg.cancelled ? 'Cancelled' : 'Joined'}
-                            </span>
-                          </td>
-                          <td>
-                            <i
-                              className={clsx(
-                                'bi',
-                                reg.paid ? 'bi-check-circle-fill text-success' : 'bi-x-circle text-warning'
-                              )}
-                              title={reg.paid ? 'Paid' : 'Unpaid'}
-                            ></i>
-                          </td>
-                          <td>
-                            {reg.arrival_date
-                              ? new Date(reg.arrival_date).toLocaleString('cs-CZ', {
-                                  dateStyle: 'short',
-                                  timeStyle: 'short',
-                                })
-                              : '-'}
-                          </td>
-                          <td>
-                            {reg.departure_date
-                              ? new Date(reg.departure_date).toLocaleString('cs-CZ', {
-                                  dateStyle: 'short',
-                                  timeStyle: 'short',
-                                })
-                              : '-'}
-                          </td>
-                          <td>{reg.children_count || 0}</td>
-                          <td
-                            className="small text-truncate"
-                            style={{ maxWidth: '150px' }}
-                            title={reg.food_restrictions}
-                          >
-                            {reg.food_restrictions || '-'}
-                          </td>
-                          <td
-                            className="small text-truncate"
-                            style={{ maxWidth: '200px' }}
-                            title={reg.note}
-                          >
-                            {reg.note || '-'}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                <div className="mb-3">
+                  <label className="form-label small text-secondary">Dietary Restrictions</label>
+                  <input
+                    type="text"
+                    className="form-control bg-dark text-white border-secondary"
+                    placeholder="e.g. Vegetarian, vegan, allergies..."
+                    value={formFoodRestrictions}
+                    onChange={(e) => setFormFoodRestrictions(e.target.value)}
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="form-label small text-secondary">Note / Additional Info</label>
+                  <textarea
+                    className="form-control bg-dark text-white border-secondary"
+                    rows={2}
+                    placeholder="Anything else organizers should know..."
+                    value={formNote}
+                    onChange={(e) => setFormNote(e.target.value)}
+                  ></textarea>
+                </div>
+              </>
+            )}
+
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                {userRegistration && !userRegistration.cancelled && (
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={handleCancelRegistration}
+                    disabled={isSubmitting}
+                  >
+                    Cancel Registration
+                  </button>
+                )}
               </div>
-            </>
-          )}
+              <button
+                type="submit"
+                className="btn btn-primary px-4"
+                disabled={isSubmitting || formJoiningStatus === 'awaiting'}
+              >
+                {isSubmitting ? 'Saving...' : 'Save Registration'}
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>
