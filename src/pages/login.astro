@@ -32,7 +32,6 @@ const apiBaseUrl = PUBLIC_API_BASE_URL;
       const urlParams = new URLSearchParams(window.location.search);
       const redirect = urlParams.get('redirect') || '/user';
       sessionStorage.setItem('login_redirect', redirect);
-      sessionStorage.setItem('oauth_in_progress', 'true');
       console.log('Saved redirect target:', redirect);
     });
   }

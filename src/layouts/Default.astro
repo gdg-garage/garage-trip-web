@@ -56,19 +56,16 @@ const gaId = PUBLIC_GA_ID;
       const link = e.target && e.target.closest ? e.target.closest('a[href="/"], .logo') : null;
       if (link) {
         sessionStorage.removeItem('login_redirect');
-        sessionStorage.removeItem('oauth_in_progress');
       }
     });
 
     // Handle redirecting back after login
-    // If we are on the home page and an OAuth login was actively in progress, navigate to saved redirect
+    // If we are on the home page and have a saved redirect, navigate to it
     if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-      const inProgress = sessionStorage.getItem('oauth_in_progress');
       const redirect = sessionStorage.getItem('login_redirect');
-      sessionStorage.removeItem('oauth_in_progress');
       sessionStorage.removeItem('login_redirect');
 
-      if (inProgress === 'true' && redirect) {
+      if (redirect) {
         console.log('Found saved redirect after login, navigating to:', redirect);
         window.location.href = redirect;
       }

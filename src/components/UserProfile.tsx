@@ -128,10 +128,7 @@ export default function UserProfile() {
                             <a
                                 href={`${PUBLIC_API_BASE_URL}/auth/discord/login`}
                                 className="button purple big"
-                                onClick={() => {
-                                    sessionStorage.setItem('login_redirect', '/user');
-                                    sessionStorage.setItem('oauth_in_progress', 'true');
-                                }}
+                                onClick={() => sessionStorage.setItem('login_redirect', '/user')}
                             >
                                 <i className="bi bi-discord me-2"></i> Login via Discord
                             </a>

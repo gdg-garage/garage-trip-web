@@ -24,14 +24,12 @@ export default function HeaderAuthButton() {
   const handleLogin = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     sessionStorage.setItem('login_redirect', '/user');
-    sessionStorage.setItem('oauth_in_progress', 'true');
     window.location.href = `${PUBLIC_API_BASE_URL}/auth/discord/login`;
   }, []);
 
   const handleLogout = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     sessionStorage.removeItem('login_redirect');
-    sessionStorage.removeItem('oauth_in_progress');
     try {
       await fetch(`${PUBLIC_API_BASE_URL}/auth/logout`, {
         method: 'GET',
